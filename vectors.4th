@@ -1,5 +1,22 @@
 \ vector words
 
+\ Copyright (C) 2017 Anton Ertl
+
+\ This file is part of vectors
+
+\ vectors is free software; you can redistribute it and/or
+\ modify it under the terms of the GNU General Public License
+\ as published by the Free Software Foundation, either version 3
+\ of the License, or (at your option) any later version.
+
+\ This program is distributed in the hope that it will be useful,
+\ but WITHOUT ANY WARRANTY; without even the implied warranty of
+\ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+\ GNU General Public License for more details.
+
+\ You should have received a copy of the GNU General Public License
+\ along with this program. If not, see http://www.gnu.org/licenses/.
+
 \ configuration parameters
 
 [undefined] simd-size [if]
@@ -215,9 +232,9 @@ s" vector length mismatch" exception constant vectlen-ex
 : vect. ( vect -- )
     cr [defined] use-refcount [if] ." refs=" dup vect-refs @ 1 .r [then]
     ."  bytes=" dup vect-bytes @ dup 2 .r
-    4 floats min 0 do
-	dup vect-data i + f@ 7 5 1 space f.rdp
-    1 floats +loop
+    4 dfloats min 0 do
+	dup vect-data i + df@ 7 5 1 space f.rdp
+    1 dfloats +loop
     drop ;
 
 : v.s ( -- )

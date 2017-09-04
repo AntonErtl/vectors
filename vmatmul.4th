@@ -1,5 +1,22 @@
 \ matrix multiplication, using the vector wordset
 
+\ Copyright (C) 2017 Anton Ertl
+
+\ This file is part of vectors
+
+\ vectors is free software; you can redistribute it and/or
+\ modify it under the terms of the GNU General Public License
+\ as published by the Free Software Foundation, either version 3
+\ of the License, or (at your option) any later version.
+
+\ This program is distributed in the hope that it will be useful,
+\ but WITHOUT ANY WARRANTY; without even the implied warranty of
+\ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+\ GNU General Public License for more details.
+
+\ You should have received a copy of the GNU General Public License
+\ along with this program. If not, see http://www.gnu.org/licenses/.
+
 include vectors.4th
 synonym f*vs df*vs
 synonym f+v df+v
@@ -31,14 +48,14 @@ synonym f+v df+v
 	c1 i th dup v@'
 	[undefined] use-vaxpy2 [if]
 	    n2 0 ?do
-		b1 i th v@  a j n2 * i + dfloats + f@ f*+vvs
+		b1 i th v@ a j n2 * i + dfloats + df@ f*+vvs
 	    loop
 	[else]
 	    n2 1 and if
-		b1 v@  a j n2 * dfloats + f@ f*+vvs then
+		b1 v@  a j n2 * dfloats + df@ f*+vvs then
 	    n2 n2 1 and ?do
 		b1 i th v@  b1 i 1+ th v@
-		a j n2 * i + dfloats + dup f@ dfloat+ f@ f*+*+vvvss
+		a j n2 * i + dfloats + dup df@ dfloat+ df@ f*+*+vvvss
 	    2 +loop
 	[then]
 	v!

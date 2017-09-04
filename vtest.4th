@@ -1,5 +1,22 @@
 \ vectors.4th tests
 
+\ Copyright (C) 2017 Anton Ertl
+
+\ This file is part of vectors
+
+\ vectors is free software; you can redistribute it and/or
+\ modify it under the terms of the GNU General Public License
+\ as published by the Free Software Foundation, either version 3
+\ of the License, or (at your option) any later version.
+
+\ This program is distributed in the hope that it will be useful,
+\ but WITHOUT ANY WARRANTY; without even the implied warranty of
+\ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+\ GNU General Public License for more details.
+
+\ You should have received a copy of the GNU General Public License
+\ along with this program. If not, see http://www.gnu.org/licenses/.
+
 include vmatmul.4th
 include ttester.fs
 
@@ -73,9 +90,9 @@ create g
     72e df,     79e df,     86e df,     93e df, 
    112e df,    123e df,    134e df,    145e df, 
 
-c 3 3 mat.
+\ c 3 3 mat.
 
-f 4 3 mat.
+\ f 4 3 mat.
 
 T{ c 9 dfloats d 9 dfloats compare -> 0 }T
 T{ f 12 dfloats g 12 dfloats compare -> 0 }T
