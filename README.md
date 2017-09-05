@@ -22,6 +22,7 @@ instead.
 
 ## Vector Types
 
+```
 prefix| name | scalar | description
 ----- | ---- | ------ | ----------------------------------
       |    v |        | General vector
@@ -35,6 +36,7 @@ prefix| name | scalar | description
    ux |  uxv |    u   | vector of unsigned 64-bit integers
    sf |  sfv |    r   | vector of 32-bit FPs
    df |  dfv |    r   | vector of 64-bit FPs
+```
 
 In the current implementation vectors of 64-bit integers are only
 supported on 64-bit systems.
@@ -82,11 +84,11 @@ not contain `u` bytes, throw an error.
 
 Store the vector token for `v` at `v-addr`.
 
-`v@ ( v-addr -- v )
+`v@ ( v-addr -- v )`
 
 Fetch the vector token `v` from `v-addr`.
 
-`v@'` ( v-addr -- v )
+`v@' ( v-addr -- v )`
 
 Fetch the vector token `v` from `v-addr`, and store 0 at v-addr.  This
 word is more efficient than `v@`.
@@ -116,7 +118,8 @@ from the underlying system.  Comparison operations produce all-bits-0
 or all-bits-1 for the number of bits in the element.  `And or xor` are
 bitwise and therefore don't have variants for different types.
 
-Words: ```
+Words:
+```
 b+v w+v l+v x+v sf+v df+v
 b-v w-v l-v x-v sf-v df-v
 b*v w*v l*v x*v sf*v df*v
@@ -134,7 +137,8 @@ b<=v w<=v l<=v x<=v ub<=v uw<=v ul<=v ux<=v sf<=v df<=v
 b>=v w>=v l>=v x>=v ub>=v uw>=v ul>=v ux>=v sf>=v df>=v
 b<>v w<>v l<>v x<>v sf<>v df<>v
 bmaxv wmaxv lmaxv xmaxv ubmaxv uwmaxv ulmaxv uxmaxv sfmaxv dfmaxv
-bminv wminv lminv xminv ubminv uwminv ulminv uxminv sfminv dfminv```
+bminv wminv lminv xminv ubminv uwminv ulminv uxminv sfminv dfminv
+```
 
 #### Unary
 
@@ -155,8 +159,6 @@ For each bit in v3: if the bit is 1, the corresponding result bit is
 the corresponding bit in v1, otherwise in v2.
 
 ### Vector/scalar parallel
-
-
 
 These words take one vector and one scalar, and apply the operation
 elementwise (always using the same scalar).  In the `vs`-suffixed
@@ -190,7 +192,8 @@ b<=vs w<=vs l<=vs x<=vs ub<=vs uw<=vs ul<=vs ux<=vs sf<=vs df<=vs
 b>=vs w>=vs l>=vs x>=vs ub>=vs uw>=vs ul>=vs ux>=vs sf>=vs df>=vs
 b<>vs w<>vs l<>vs x<>vs sf<>vs df<>vs
 bmaxvs wmaxvs lmaxvs xmaxvs ubmaxvs uwmaxvs ulmaxvs uxmaxvs sfmaxvs dfmaxvs
-bminvs wminvs lminvs xminvs ubminvs uwminvs ulminvs uxminvs sfminvs dfminvs```
+bminvs wminvs lminvs xminvs ubminvs uwminvs ulminvs uxminvs sfminvs dfminvs
+```
 
 #### Scalar/Vector words
 
@@ -206,4 +209,5 @@ brshiftsv wrshiftsv lrshiftsv xrshiftsv ubrshiftsv uwrshiftsv ulrshiftsv uxrshif
 b<sv w<sv l<sv x<sv ub<sv uw<sv ul<sv ux<sv sf<sv df<sv
 b>sv w>sv l>sv x>sv ub>sv uw>sv ul>sv ux>sv sf>sv df>sv
 b<=sv w<=sv l<=sv x<=sv ub<=sv uw<=sv ul<=sv ux<=sv sf<=sv df<=sv
-b>=sv w>=sv l>=sv x>=sv ub>=sv uw>=sv ul>=sv ux>=sv sf>=sv df>=sv```
+b>=sv w>=sv l>=sv x>=sv ub>=sv uw>=sv ul>=sv ux>=sv sf>=sv df>=sv
+```
