@@ -522,7 +522,7 @@ s" vector length mismatch" exception constant vectlen-ex
   genv-binary      l<>v      lnev_  l-type <>
   genv-binary      x<>v      xnev_  x-type <>
   genv-binary     sf<>v     sfnev_ sf-type f<>
-  genv-binary     dfnev     dfnev_ df-type f<>
+  genv-binary     df<>v     dfnev_ df-type f<>
   genv-binary     bmaxv     bmaxv_  b-type max
   genv-binary     wmaxv     wmaxv_  w-type max
   genv-binary     lmaxv     lmaxv_  l-type max
@@ -646,7 +646,7 @@ s" vector length mismatch" exception constant vectlen-ex
   genvs      l<>vs      lnevs_  l-type <>
   genvs      x<>vs      xnevs_  x-type <>
   genvs     sf<>vs     sfnevs_ sf-type f<>
-  genvs     dfnevs     dfnevs_ df-type f<>
+  genvs     df<>vs     dfnevs_ df-type f<>
   genvs     bmaxvs     bmaxvs_  b-type max
   genvs     wmaxvs     wmaxvs_  w-type max
   genvs     lmaxvs     lmaxvs_  l-type max
