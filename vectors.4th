@@ -27,6 +27,10 @@
     1 constant unroll-factor
 [then]
 
+[defined] use-chaining [if]
+    1 constant use-refcount
+[then]
+
 \ missing features on some Forth systems
 
 [undefined] parse-name [if]
@@ -137,10 +141,12 @@ simd-size unroll-factor * constant vector-granularity
     field: vect-refs \ reference count-1
 [then]
 field: vect-bytes
+[defined] use-chaining [if]
+    cfield: vect-traceentry
+[then]
 simd-size naligned
 0 +field vect-data
 constant vect
-
 
 \ type descriptors
 
@@ -180,7 +186,7 @@ create ux-type ' ux@ , '  x! , '  dup , '  over , '  drop , 8 ,
 create sf-type ' sf@ , ' sf! , ' fdup , ' fover , ' fdrop , 4 ,
 create df-type ' df@ , ' df! , ' fdup , ' fover , ' fdrop , 8 ,
 
-[undefined] use-scalar [if]
+[undefined] use-scalar [undefined] use-chaining and [if]
     s" gforth" environment? [if]
 	2drop
 	include vectors-gforth.4th
@@ -242,12 +248,13 @@ s" vector length mismatch" exception constant vectlen-ex
 	i @ vect.
     1 cells +loop ;
 
-\ locals are used in the gen-...-inner words, to avoid needin to know
+\ locals are used in the gen-...-inner words, to avoid needing to know
 \ the stack effect of the type-@ words.  This necessitates EVALUATE,
 \ but fortunately, these are internal-use words, so we control the
 \ environment.
 
-: ignore-undefined-type ( xt "name" "replacement" "type" "word" -- xt "name" "replacement" "type" "word" )
+: ignore-undefined-type ( xt "name" "replacement" "type" "word" -- xt "name" "replacement" "type" "word" false | true )
+    \ skip this set of inputs if type is unknown
     >in @ parse-name 2drop parse-name 2drop bl word find if
 	drop >in ! false
     else
@@ -255,6 +262,11 @@ s" vector length mismatch" exception constant vectlen-ex
     then ;
 
 : type?exit ]] ignore-undefined-type if exit then [[ ; immediate
+
+
+[defined] use-chaining [if]
+    require chaining.4th
+[else]
 
 : genv-binary-inner ( "replacement" "type" "word" -- )
     ( run-time: addr1 addr2 addr u -- )
@@ -406,6 +418,7 @@ s" vector length mismatch" exception constant vectlen-ex
     [genv-ternary-inner] bmuxv_ b-type mux
     r> drop >r vect-free vect-free vect-free r> ( r:vect )
     vsp @ [ 2 cells ] literal + dup vsp ! ! ;
+[then]
 
   genv-binary       b+v    bplusv_  b-type +
   genv-binary       w+v    wplusv_  w-type +

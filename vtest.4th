@@ -96,3 +96,4 @@ create g
 
 T{ c 9 dfloats d 9 dfloats compare -> 0 }T
 T{ f 12 dfloats g 12 dfloats compare -> 0 }T
+cr
