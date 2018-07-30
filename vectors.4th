@@ -142,11 +142,16 @@ simd-size unroll-factor * constant vector-granularity
 [then]
 field: vect-bytes
 [defined] use-chaining [if]
+    field:  vect-datap
     cfield: vect-traceentry
+    : vect-data vect-datap @ ;
+    aligned
+[else]
+    simd-size naligned
+    0 +field vect-data
 [then]
-simd-size naligned
-0 +field vect-data
-constant vect
+constant /vect
+synonym vect /vect
 
 \ type descriptors
 
@@ -215,6 +220,7 @@ s" vector length mismatch" exception constant vectlen-ex
 : v> ( v -- vect )
     vsp @ dup cell+ vsp ! @ ;
 
+[undefined] use-chaining [if]
 : vect-free ( vect -- )
     [defined] use-refcount [if]
 	?dup-if
@@ -234,6 +240,9 @@ s" vector length mismatch" exception constant vectlen-ex
     [then]
     r@ vect-bytes !
     r> ;
+
+: finish-trace ; immediate \ a noop when not chaining
+[then]
 
 : vect. ( vect -- )
     cr [defined] use-refcount [if] ." refs=" dup vect-refs @ 1 .r [then]
@@ -255,11 +264,12 @@ s" vector length mismatch" exception constant vectlen-ex
 
 : ignore-undefined-type ( xt "name" "replacement" "type" "word" -- xt "name" "replacement" "type" "word" false | true )
     \ skip this set of inputs if type is unknown
-    >in @ parse-name 2drop parse-name 2drop bl word find if
-	drop >in ! false
-    else
-	parse-name 2drop 2drop true
-    then ;
+    >in @ parse-name 2drop parse-name {: d: repl :} bl word find 0<>
+    [defined] use-chaining [if]
+	repl find-name 0<> and [then]
+    if
+	drop >in ! false exit then
+    parse-name 2drop 2drop true ;
 
 : type?exit ]] ignore-undefined-type if exit then [[ ; immediate
 
@@ -766,6 +776,7 @@ s" vector length mismatch" exception constant vectlen-ex
     r> >v ;
 
 : b!v ( v c-addr u -- )
+    finish-trace
     v> >r
     r@ vect-bytes @ over <> vbuflen-ex and throw
     r@ vect-data rot rot move
