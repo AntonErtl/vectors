@@ -244,9 +244,12 @@ s" vector length mismatch" exception constant vectlen-ex
 : finish-trace ; immediate \ a noop when not chaining
 [then]
 
+: short-vect. ( vect -- )
+    [defined] use-refcount [if] ." refs=" dup vect-refs @ 1 .r [then]
+    ."  bytes=" dup vect-bytes @ dup 2 .r ;
+
 : vect. ( vect -- )
-    cr [defined] use-refcount [if] ." refs=" dup vect-refs @ 1 .r [then]
-    ."  bytes=" dup vect-bytes @ dup 2 .r
+    cr dup short-vect.
     4 dfloats min 0 do
 	dup vect-data i + df@ 7 5 1 space f.rdp
     1 dfloats +loop

@@ -48,6 +48,18 @@ variable ncgens 0 ncgens !
 : current-cgen ( -- cgenp )
     cgens ncgens @ /cgen * + ;
 
+: quad. ( addr -- ) drop ;
+
+: print-trace ( -- )
+    cr ." rscalars:" nrscalars @ 0 ?do
+	rscalars i floats + f@ space 7 5 1 f.rdp loop
+    cr ." xscalars:" nxscalars @ 0 ?do
+	xscalars i th + @ . loop
+    cr ." vector inputs:" max-inputs ninputs @ +do
+	cr vects i th @ .vect-short ." <-" i 2 .r loop
+    cr ." quads:" nquads @ max-inputs +do
+	cr quads i /quad * + .quad vects ith @ .vect-short ." <-" i 2 .r loop ;
+
 \ replacement words
 
 : vect-alloc ( u -- vect )
@@ -102,13 +114,12 @@ synonym genv-sv-c genv-vs-c
 
 include genc.4th
 
-
 \ code generation for a whole trace
+
+: finish-trace ( -- ) print-trace ;
 
 
 \ vector word definers
-
-: finish-trace ( -- ) ;
 
 : check-bytes ( u -- )
     \ check if the length u of the current vector fits with the trace.
@@ -153,7 +164,7 @@ include genc.4th
     vsp @ dup @ {: vect2 :} cell+ dup @ {: vect1 :} vsp !
     vect1 vect-bytes @ {: bytes :}
     bytes check-bytes
-    vect2 vect-bytes @ <> vectlen-ex and throw
+    vect2 vect-bytes @ bytes <> vectlen-ex and throw
     nquads @ dup {: n :} 1+ nquads !
     uop vect1 consume vect2 consume quads n /quad * + quad!
     bytes n new-vect {: vect :}
@@ -184,9 +195,9 @@ include genc.4th
     \ store the scalar in RSCALARS or XSCALARS, depending on type;
     \ uindex is the index into that array.
     /cgen * cgens + cgen-stype c@ assert( dup 'r' = over 'n' = or ) 'r' = if
-	nrscalars @ dup 1+ nrscalars ! floats rscalars + f!
+	nrscalars @ dup 1+ nrscalars ! dup floats rscalars + f!
     else
-	nxscalars @ dup 1+ nxscalars ! cells  xscalars + !
+	nxscalars @ dup 1+ nxscalars ! tuck cells  xscalars + !
     then ;
 
 : do-vs ( v1 scalar uop -- v ) {: uop :}
