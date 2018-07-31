@@ -23,8 +23,9 @@ cfield: quad-in2 \ trace index of input operand (0 if unneeded)
 constant /quad
 
 0
-wfield: cgen-xt
+field: cgen-xt \ xt of the nameless code generator
 cfield: cgen-stype \ scalar type ('r' or 'n')
+field: cgen-nt \ nt of the constant with the name of the cgen
 aligned constant /cgen
 
 create quads max-trace /quad * allot
@@ -48,17 +49,27 @@ variable ncgens 0 ncgens !
 : current-cgen ( -- cgenp )
     cgens ncgens @ /cgen * + ;
 
-: quad. ( addr -- ) drop ;
+: typer ( c-addr u1 u2 -- )
+    tuck umin tuck - >r type r> spaces ;
+
+: cgen. ( u -- )
+    /cgen * cgens + cgen-nt @ name>string 10 typer ;
+
+: quad. {: qp -- :}
+    qp quad-op w@ cgen.
+    qp quad-in1 c@ 3 .r
+    qp quad-in2 c@ 3 .r ;
 
 : print-trace ( -- )
     cr ." rscalars:" nrscalars @ 0 ?do
 	rscalars i floats + f@ space 7 5 1 f.rdp loop
     cr ." xscalars:" nxscalars @ 0 ?do
 	xscalars i th + @ . loop
-    cr ." vector inputs:" max-inputs ninputs @ +do
-	cr vects i th @ .vect-short ." <-" i 2 .r loop
-    cr ." quads:" nquads @ max-inputs +do
-	cr quads i /quad * + .quad vects ith @ .vect-short ." <-" i 2 .r loop ;
+    max-inputs ninputs @ +do
+	cr 17 spaces vects i th @ vect.short ."  :" i 2 .r loop
+    nquads @ max-inputs +do
+	cr quads i /quad * + quad. space
+	vects i th @ vect.short ."  :" i 2 .r loop ;
 
 \ replacement words
 
@@ -98,15 +109,15 @@ variable ncgens 0 ncgens !
 0 0 2value t
 
 : genv-c ( "name" "type" "forth-code\n" -- )
-    ncgens @ constant parse-name save-mem to t 0
+    ncgens @ constant latest parse-name save-mem to t 0 ( nt stypef )
     :noname ( quadp -- ) ]] binary-c-inputs [[ -1 parse evaluate ]] ; [[
-    current-cgen tuck cgen-xt ! cgen-stype c! 1 ncgens +! ;
+    current-cgen tuck cgen-xt ! tuck cgen-stype c! cgen-nt ! 1 ncgens +! ;
 
 : genv-vs-c ( "name" "vtype" "stypef" "forth-code\n" -- )
-    ncgens @ constant parse-name save-mem to t
+    ncgens @ constant latest parse-name save-mem to t
     parse-name dup assert( 1 = ) drop c@
     :noname ( quadp -- ) ]] binary-c-inputs [[ -1 parse evaluate ]] ; [[
-    current-cgen tuck cgen-xt ! cgen-stype c! 1 ncgens +! ;
+    current-cgen tuck cgen-xt ! tuck cgen-stype c! cgen-nt ! 1 ncgens +! ;
 
 synonym genv-binary-c genv-c
 synonym genv-unary-c genv-c
@@ -116,8 +127,9 @@ include genc.4th
 
 \ code generation for a whole trace
 
-: finish-trace ( -- ) print-trace ;
-
+: finish-trace ( -- )
+    print-trace
+    0 nrscalars ! 0 nxscalars ! max-inputs ninputs ! max-inputs nquads ! ;
 
 \ vector word definers
 
@@ -165,7 +177,7 @@ include genc.4th
     vect1 vect-bytes @ {: bytes :}
     bytes check-bytes
     vect2 vect-bytes @ bytes <> vectlen-ex and throw
-    nquads @ dup {: n :} 1+ nquads !
+    nquads @ ~~ dup {: n :} 1+ nquads !
     uop vect1 consume vect2 consume quads n /quad * + quad!
     bytes n new-vect {: vect :}
     vect vects n th !
@@ -180,7 +192,7 @@ include genc.4th
     vsp @ dup @ {: vect1 :}
     vect1 vect-bytes @ {: bytes :}
     bytes check-bytes
-    nquads @ dup {: n :} 1+ nquads !
+    nquads @ ~~ dup {: n :} 1+ nquads !
     uop vect1 consume 0 quads n /quad * + quad!
     bytes n new-vect {: vect :}
     vect vects n th !
@@ -202,11 +214,11 @@ include genc.4th
 
 : do-vs ( v1 scalar uop -- v ) {: uop :}
     \ type of scalar determined by cgen-stype
-    uop do-scalar {: sindex :}
     vsp @ dup @ {: vect1 :}
     vect1 vect-bytes @ {: bytes :}
     bytes check-bytes
-    nquads @ dup {: n :} 1+ nquads !
+    uop do-scalar {: sindex :}
+    nquads @ ~~ dup {: n :} 1+ nquads !
     uop vect1 consume sindex quads n /quad * + quad!
     bytes n new-vect {: vect :}
     vect vects n th !

@@ -44,6 +44,8 @@ T{ v2 v! -> }T
 T{ v1 v@ v2 v@' df+v -> }T
 T{ v2 v! -> }T
 
+cr ." a" cr
+
 : init-matrix {: m ncols nrows nstart -- :}
     \ initialize m with dfloats nstart, nstart+1, ...
     nstart nrows 0 ?do
@@ -70,6 +72,8 @@ dfalign here 12 dfloats allot constant f
 	    m j ncols * i + dfloats + df@ 7 0 1 f.rdp space
 	loop
     loop ;
+
+cr ." b" cr
 
 \ a 2 3 mat. cr
 \ b 3 2 mat. cr

@@ -37,7 +37,8 @@ synonym f+v df+v
 
 [undefined] use-vaxpy [if]
     : f*+vvs ]] f*vs f+v [[ ; immediate
-    
+[then]    
+
 : matmulr {: a b c n1 n2 n3 | b1 c1 -- :}
     \ C = A x B, where A has n1 rows and n2 columns,
     \ B has n2 rows and n3 columns, and C has n1 rows and n3 columns
@@ -45,7 +46,7 @@ synonym f+v df+v
     c n1 n3 * dfloats erase
     n1 cells allocate throw to c1 c1 n1 cells erase c1 n1 n3 c mat@
     n1 0 ?do
-	c1 i th dup v@'
+	c1 i th dup ~~ v@' cr v.s cr
 	[undefined] use-vaxpy2 [if]
 	    n2 0 ?do
 		b1 i th v@ a j n2 * i + dfloats + df@ f*+vvs
@@ -58,8 +59,6 @@ synonym f+v df+v
 		a j n2 * i + dfloats + dup df@ dfloat+ df@ f*+*+vvvss
 	    2 +loop
 	[then]
-	v!
+	print-trace ~~ v!
     loop
     c1 n1 n3 c mat! ;
-
-[then]

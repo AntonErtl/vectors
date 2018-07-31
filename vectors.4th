@@ -242,22 +242,26 @@ s" vector length mismatch" exception constant vectlen-ex
     r> ;
 
 : finish-trace ; immediate \ a noop when not chaining
+: print-trace ; immediate
 [then]
 
-: short-vect. ( vect -- )
-    [defined] use-refcount [if] ." refs=" dup vect-refs @ 1 .r [then]
-    ."  bytes=" dup vect-bytes @ dup 2 .r ;
+: vect.short ( vect -- )
+    dup hex. \ 16 ['] u. 16 base-execute
+    [defined] use-refcount [if] ." refs=" dup vect-refs @ 2 .r [then]
+    ."  bytes=" dup vect-bytes @ 2 .r
+    space '=' '0' rot vect-data select emit ;
+
 
 : vect. ( vect -- )
-    cr dup short-vect.
-    4 dfloats min 0 do
+    cr dup vect.short
+    dup vect-bytes @ 4 dfloats min 0 do
 	dup vect-data i + df@ 7 5 1 space f.rdp
     1 dfloats +loop
     drop ;
 
 : v.s ( -- )
     vect-stack vect-stack-items th vsp @ ?do
-	i @ vect.
+	i @ vect.short
     1 cells +loop ;
 
 \ locals are used in the gen-...-inner words, to avoid needing to know
