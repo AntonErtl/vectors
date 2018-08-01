@@ -189,7 +189,7 @@ include genc.4th
     parse-name 2drop parse-name 2drop ]] do-binary ; [[ ;
 
 : do-unary ( v1 uop -- v ) {: uop :}
-    vsp @ dup @ {: vect1 :}
+    vsp @ @ {: vect1 :}
     vect1 vect-bytes @ {: bytes :}
     bytes check-bytes
     nquads @ ~~ dup {: n :} 1+ nquads !
@@ -212,9 +212,9 @@ include genc.4th
 	nxscalars @ dup 1+ nxscalars ! tuck cells  xscalars + !
     then ;
 
-: do-vs ( v1 scalar uop -- v ) {: uop :}
+: do-vs ( v1 scalar uop -- v ) ~~ {: uop :}
     \ type of scalar determined by cgen-stype
-    vsp @ dup @ {: vect1 :}
+    vsp @ @ {: vect1 :}
     vect1 vect-bytes @ {: bytes :}
     bytes check-bytes
     uop do-scalar {: sindex :}
@@ -222,7 +222,7 @@ include genc.4th
     uop vect1 consume sindex quads n /quad * + quad!
     bytes n new-vect {: vect :}
     vect vects n th !
-    vect vsp @ ! ;
+    vect vsp @ ! ~~ ;
 
 : genvs ( "name" "codegen" "type" "word" -- )
     type?exit :
