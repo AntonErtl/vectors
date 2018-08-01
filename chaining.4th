@@ -71,26 +71,32 @@ variable ncgens 0 ncgens !
 	cr quads i /quad * + quad. space
 	vects i th @ vect.short ."  :" i 2 .r loop ;
 
+: in-trace? {: vect -- f :}
+    vect vect-traceentry c@ {: u :}
+    u ninputs @ nquads @ within if \ check if u is from the current trace
+	vects u th @ vect = exit then
+    false ;
+
 \ replacement words
 
 : vect-data-alloc ( u -- addr )
-    vector-granularity 2dup naligned aligned_alloc dup 0= -59 and throw ;
+    vector-granularity tuck naligned aligned_alloc dup 0= -59 and throw ;
 
 : vect-alloc ( u -- vect )
     /vect allocate throw >r
-    vector-granularity 2dup naligned aligned_alloc dup 0= -59 and throw
-    vect-data-alloc r@ vect-datap !
+    dup vect-data-alloc r@ vect-datap !
     [defined] use-refcount [if]
 	0 r@ vect-refs !
     [then]
     r@ vect-bytes !
     r> ;
 
-: vect-free ( vect -- )
-    ?dup-if
-	dup vect-refs @ assert( dup 0>= ) dup if
-	    1- swap vect-refs ! exit then
-	drop dup vect-data free throw free throw
+: vect-free {: vect -- :}
+    vect if
+	vect vect-refs @ assert( dup 0>= ) dup if
+	    1- vect vect-refs ! exit then
+	drop vect in-trace? ?exit
+	vect vect-data free throw vect free throw
     then ;
 
 \ C code generators for vector words
@@ -140,8 +146,8 @@ include genc.4th
 	vects i th @ dup vect-refs @ -1 = if
 	    dup vect-data free throw free throw
 	else
-	    assert( dup vect-data @ 0= )
-	    dup vect-bytes @ vect-data-alloc swap vect-datap ! then
+	    assert( ~~ dup vect-data 0= )
+	    dup vect-bytes @ ~~ vect-data-alloc ~~ swap ~~ vect-datap ! then
     loop
     0 nrscalars ! 0 nxscalars ! max-inputs ninputs ! max-inputs nquads ! ;
 
@@ -161,11 +167,8 @@ include genc.4th
     \ vects
     assert( vect vect-refs @ 0>= )
     -1 vect vect-refs +!
-    scope vect vect-traceentry c@ {: u :}
-    u ninputs @ nquads @ within if \ check if u is from the current trace
-	vects u th @ vect = if
-	    u exit then then \ if so, return it
-    endscope
+    vect in-trace? if
+	vect vect-traceentry c@ exit then
     \ otherwise the vector is an input vector for the current trace
     ninputs @ 1- {: u :} assert( u 0>= )
     u ninputs !
