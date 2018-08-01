@@ -73,10 +73,13 @@ variable ncgens 0 ncgens !
 
 \ replacement words
 
+: vect-data-alloc ( u -- addr )
+    vector-granularity 2dup naligned aligned_alloc dup 0= -59 and throw ;
+
 : vect-alloc ( u -- vect )
     /vect allocate throw >r
     vector-granularity 2dup naligned aligned_alloc dup 0= -59 and throw
-    r@ vect-datap !
+    vect-data-alloc r@ vect-datap !
     [defined] use-refcount [if]
 	0 r@ vect-refs !
     [then]
@@ -129,6 +132,17 @@ include genc.4th
 
 : finish-trace ( -- )
     print-trace
+    max-inputs ninputs @ +do
+	vects i th @ dup vect-refs @ -1 = if
+	    dup vect-data free throw dup free throw then
+	drop loop
+    nquads @ max-inputs +do
+	vects i th @ dup vect-refs @ -1 = if
+	    dup vect-data free throw free throw
+	else
+	    assert( dup vect-data @ 0= )
+	    dup vect-bytes @ vect-data-alloc swap vect-datap ! then
+    loop
     0 nrscalars ! 0 nxscalars ! max-inputs ninputs ! max-inputs nquads ! ;
 
 \ vector word definers
@@ -212,7 +226,7 @@ include genc.4th
 	nxscalars @ dup 1+ nxscalars ! tuck cells  xscalars + !
     then ;
 
-: do-vs ( v1 scalar uop -- v ) ~~ {: uop :}
+: do-vs ( v1 scalar uop -- v ) {: uop :}
     \ type of scalar determined by cgen-stype
     vsp @ @ {: vect1 :}
     vect1 vect-bytes @ {: bytes :}
@@ -222,7 +236,7 @@ include genc.4th
     uop vect1 consume sindex quads n /quad * + quad!
     bytes n new-vect {: vect :}
     vect vects n th !
-    vect vsp @ ! ~~ ;
+    vect vsp @ ! ;
 
 : genvs ( "name" "codegen" "type" "word" -- )
     type?exit :
