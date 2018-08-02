@@ -46,7 +46,7 @@ synonym f+v df+v
     c n1 n3 * dfloats erase
     n1 cells allocate throw to c1 c1 n1 cells erase c1 n1 n3 c mat@
     n1 0 ?do
-	c1 i th dup v@' cr v.s cr
+	c1 i th dup v@'
 	[undefined] use-vaxpy2 [if]
 	    n2 0 ?do
 		b1 i th v@ a j n2 * i + dfloats + df@ f*+vvs

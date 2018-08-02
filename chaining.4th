@@ -228,7 +228,7 @@ include genc.4th
 
 : current-execute ( wid xt -- )
     \ perform xt while current is wid
-    get-current {: old :} swap set-current ~~ catch ~~ old set-current ~~ throw ;
+    get-current {: old :} swap set-current catch old set-current throw ;
 
 table constant traces \ contains all the chain words generated in this session
 
@@ -252,7 +252,7 @@ previous
 
 : finish-trace ( -- )
     nquads @ max-inputs = ?exit
-    print-trace
+    \ print-trace
     nquads @ max-inputs +do
 	vects i th @ dup vect-refs @ -1 = if
 	    dup vect-data free throw free throw
@@ -262,7 +262,7 @@ previous
 	    quads i /quad * + set-quad-result
 	then
     loop
-    vects xscalars rscalars trace-bytes @ trace-libcc dup xt-see execute
+    vects xscalars rscalars trace-bytes @ trace-libcc execute
     max-inputs ninputs @ +do
 	vects i th @ dup vect-refs @ -1 = if
 	    dup vect-data free throw dup free throw then
