@@ -46,17 +46,30 @@ variable trace-bytes
 create cgens  max-cgens /cgen * allot
 variable ncgens 0 ncgens !
 
+$3fff constant quad-op-mask     \ operation number
+$4000 constant quad-result-mask \ bit is set if the result needs to be written
+\ MSB not used here so that the quad fits in 6 base-36 digits on big-endian
+
+: quad-op-cgen ( quad -- cgenp )
+    quad-op w@ quad-op-mask and /cgen * cgens + ;
+
+: quad-result ( quad -- f )
+    quad-op w@ quad-result-mask and 0<> ;
+
+: set-quad-result ( quad -- )
+    quad-op dup w@ quad-result-mask xor swap w! ; 
+
 : current-cgen ( -- cgenp )
     cgens ncgens @ /cgen * + ;
 
 : typer ( c-addr u1 u2 -- )
     tuck umin tuck - >r type r> spaces ;
 
-: cgen. ( u -- )
-    /cgen * cgens + cgen-nt @ name>string 10 typer ;
+: cgen. ( cgen -- )
+    cgen-nt @ name>string 10 typer ;
 
 : quad. {: qp -- :}
-    qp quad-op w@ cgen.
+    qp quad-op-cgen cgen.
     qp quad-in1 c@ 3 .r
     qp quad-in2 c@ 3 .r ;
 
@@ -111,11 +124,11 @@ variable ncgens 0 ncgens !
 : varg ( n c-addr u -- ) ( generated code: -- )
     "((" gen gen ")v" gen
     0 .r ")" gen ;
-: sarg ( n c-addr u -- ) ( generated code: -- )
-    "((" gen gen ")s" gen
-    0 .r ")" gen ;
+: sarg ( n char -- ) ( generated code: -- )
+    emit 0 .r ;
 
 0 0 2value t
+'x' value s
 
 : genv-c ( "name" "type" "forth-code\n" -- )
     ncgens @ constant latest parse-name save-mem to t 0 ( nt stypef )
@@ -124,7 +137,7 @@ variable ncgens 0 ncgens !
 
 : genv-vs-c ( "name" "vtype" "stypef" "forth-code\n" -- )
     ncgens @ constant latest parse-name save-mem to t
-    parse-name dup assert( 1 = ) drop c@
+    parse-name dup assert( 1 = ) drop c@ dup to s
     :noname ( quadp -- ) ]] binary-c-inputs [[ -1 parse evaluate ]] ; [[
     current-cgen tuck cgen-xt ! tuck cgen-stype c! cgen-nt ! 1 ncgens +! ;
 
@@ -136,6 +149,41 @@ include genc.4th
 
 \ code generation for a whole trace
 
+: .n 0 .r ;
+\ narrow prining
+
+: trace-name ( -- c-addr u )
+    <# [: nquads @ assert( dup max-inputs - 16 cells 6 / <= ) max-inputs ?do
+	    quads i /quad * + l@ 0 6 0 do # loop 2drop
+	loop ;] #36 base-execute 't' hold 0 0 #> ;
+
+: trace-code ( -- )
+    \ code generation for the trace
+    trace-name save-mem {: tname :}
+    cr ." void " tname type ." (Vect *vs[], Cell ns[], Float rs[], long bytes) {"
+    cr ."   long i;
+    max-inputs ninputs @ ?do
+	vects i th @ vect-data if
+	    cr ."   vb *pv" i .n ."  = vs[" i .n ." ]->vect_data;" then
+    loop
+    nquads @ max-inputs ?do
+	quads i /quad * + quad-result  if
+	    cr ."   vb *pv" i .n ."  = vs[" i .n ." ]->vect_data;" then
+    loop
+    nxscalars @ 0 ?do
+	cr ."   Cell n" i .n ."  = ns[" i .n ." ];" loop
+    nrscalars @ 0 ?do
+	cr ."   Float r" i .n ."  = rs[" i .n ." ];" loop
+    cr ."   for (i=0; i<bytes; i+=sizeof(vb)) {"
+    max-inputs ninputs @ ?do
+	cr ."     vb v" i .n ."  = pv" i .n ." [i];" loop
+    nquads @ max-inputs ?do
+	cr ."     vb v" i .n ."  = (vb)("
+	quads i /quad * + {: q :} q q quad-op-cgen cgen-xt @ execute ." );"
+	q quad-result if ."  pv" i .n ." [i] = v" i .n ." ;" then
+    loop
+    .\" \n  }\n}" ;
+
 : finish-trace ( -- )
     print-trace
     max-inputs ninputs @ +do
@@ -146,9 +194,12 @@ include genc.4th
 	vects i th @ dup vect-refs @ -1 = if
 	    dup vect-data free throw free throw
 	else
-	    assert( ~~ dup vect-data 0= )
-	    dup vect-bytes @ ~~ vect-data-alloc ~~ swap ~~ vect-datap ! then
+	    assert( dup vect-data 0= )
+	    dup vect-bytes @ vect-data-alloc swap vect-datap !
+	    quads i /quad * + set-quad-result
+	then
     loop
+    trace-code
     0 nrscalars ! 0 nxscalars ! max-inputs ninputs ! max-inputs nquads ! ;
 
 \ vector word definers
@@ -177,7 +228,7 @@ include genc.4th
     u ;
 
 : new-vect ( ubytes utraceentry -- vect )
-    vect allocate throw {: vect :}
+    /vect allocate throw {: vect :}
     0 vect vect-refs !
     0 vect vect-datap !
     vect vect-traceentry c!
@@ -194,7 +245,7 @@ include genc.4th
     vect1 vect-bytes @ {: bytes :}
     bytes check-bytes
     vect2 vect-bytes @ bytes <> vectlen-ex and throw
-    nquads @ ~~ dup {: n :} 1+ nquads !
+    nquads @ dup {: n :} 1+ nquads !
     uop vect1 consume vect2 consume quads n /quad * + quad!
     bytes n new-vect {: vect :}
     vect vects n th !
@@ -209,7 +260,7 @@ include genc.4th
     vsp @ @ {: vect1 :}
     vect1 vect-bytes @ {: bytes :}
     bytes check-bytes
-    nquads @ ~~ dup {: n :} 1+ nquads !
+    nquads @ dup {: n :} 1+ nquads !
     uop vect1 consume 0 quads n /quad * + quad!
     bytes n new-vect {: vect :}
     vect vects n th !
@@ -235,7 +286,7 @@ include genc.4th
     vect1 vect-bytes @ {: bytes :}
     bytes check-bytes
     uop do-scalar {: sindex :}
-    nquads @ ~~ dup {: n :} 1+ nquads !
+    nquads @ dup {: n :} 1+ nquads !
     uop vect1 consume sindex quads n /quad * + quad!
     bytes n new-vect {: vect :}
     vect vects n th !
