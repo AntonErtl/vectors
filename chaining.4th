@@ -167,7 +167,7 @@ include genc.4th
     cr ." void " tname type ." (Vect *vs[], Cell ns[], Float rs[], long bytes) {"
     cr ."   long i;
     max-inputs ninputs @ ?do
-	cr ."   vb *pv" i .n ."  = vs[" i .n .\" ]->vect_data; printf(\"\\nvs[i]=%p pv" i .n .\" =%p\",vs[" i .n .\" ], pv" i .n ." );" loop
+	cr ."   vb *pv" i .n ."  = vs[" i .n .\" ]->vect_data; /* printf(\"\\nvs[i]=%p pv" i .n .\" =%p\",vs[" i .n .\" ], pv" i .n ." ); */" loop
     nquads @ max-inputs ?do
 	quads i /quad * + quad-result  if
 	    cr ."   vb *pv" i .n ."  = vs[" i .n ." ]->vect_data;" then
@@ -222,19 +222,30 @@ include genc.4th
     cr ." } Vect;"
     tname trace-code ;
 
+
+: current-execute ( wid xt -- )
+    \ perform xt while current is wid
+    get-current {: old :} swap set-current ~~ catch ~~ old set-current ~~ throw ;
+
+table constant traces \ contains all the chain words generated in this session
+
 also c-lib
 : trace-c-function ( tname -- )
     [: 2dup type space type ."  a a a n -- void" ;] >string-execute
-    2dup ['] c-function execute-parsing drop free throw ;
+    2dup ['] c-function traces ['] execute-parsing current-execute drop free throw ;
 previous
 
 : trace-libcc ( -- xt )
     trace-name save-mem {: d: tname :}
-    tname ['] c-library execute-parsing
-    tname ['] c-code >c
-    tname trace-c-function
-    end-c-library
-    tname find-name name>interpret ;
+    tname traces find-name-in dup 0= if
+	drop
+	tname ['] c-library execute-parsing
+	tname ['] c-code >c
+	tname trace-c-function
+	end-c-library
+	tname traces find-name-in
+    then
+    name>interpret ;
 
 : finish-trace ( -- )
     nquads @ max-inputs = ?exit
