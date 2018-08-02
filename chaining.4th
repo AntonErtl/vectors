@@ -41,6 +41,8 @@ variable trace-bytes
 \ processed in one loop.  But this length is a parameter at run-time
 \ (i.e., the code generated for a trace can be used for different
 \ vector lengths).
+variable trace-cost 0 trace-cost ! \ number of registers needed for the trace
+15 constant max-trace-cost \ 16 registers, leave some spare room
 
 350 constant max-cgens \ xt ( quadp -- ) that outputs C code for a quad
 create cgens  max-cgens /cgen * allot
@@ -82,7 +84,8 @@ $4000 constant quad-result-mask \ bit is set if the result needs to be written
 	cr 17 spaces vects i th @ vect.short ."  :" i 2 .r loop
     nquads @ max-inputs +do
 	cr quads i /quad * + quad. space
-	vects i th @ vect.short ."  :" i 2 .r loop ;
+	vects i th @ vect.short ."  :" i 2 .r loop
+    cr ." trace-cost =" trace-cost @ . ;
 
 : in-trace? {: vect -- f :}
     vect vect-traceentry c@ {: u :}
@@ -264,14 +267,18 @@ previous
 	vects i th @ dup vect-refs @ -1 = if
 	    dup vect-data free throw dup free throw then
 	drop loop
-    0 nrscalars ! 0 nxscalars ! max-inputs ninputs ! max-inputs nquads ! ;
+    0 nrscalars ! 0 nxscalars ! max-inputs ninputs ! max-inputs nquads !
+    0 trace-cost ! ;
 
 \ vector word definers
 
 : check-bytes ( u -- )
     \ check if the length u of the current vector fits with the trace.
-    \ If not, finish the trace and start a new one
-    trace-bytes @ over = if drop exit then
+    \ If not, or if the cost is too large, finish the trace and start
+    \ a new one
+    trace-bytes @ over = if
+	trace-cost @ max-trace-cost < if
+	    drop exit then then
     nquads @ max-inputs <> if \ there is at least one quad in the trace
 	finish-trace then
     trace-bytes ! ;
@@ -281,7 +288,7 @@ previous
     \ vects, if it is not already there.  u is the index of vect in
     \ vects
     assert( vect vect-refs @ 0>= )
-    -1 vect vect-refs +!
+    vect vect-refs @ dup 1- vect vect-refs ! 0= trace-cost +!
     vect in-trace? if
 	vect vect-traceentry c@ exit then
     \ otherwise the vector is an input vector for the current trace
@@ -313,7 +320,8 @@ previous
     uop vect1 consume vect2 consume quads n /quad * + quad!
     bytes n new-vect {: vect :}
     vect vects n th !
-    vect vsp @ ! ;
+    vect vsp @ !
+    2 trace-cost +! ;
 
 : genv-binary ( "name" "codegen" "type" "word" -- )
     type?exit :
@@ -328,7 +336,8 @@ previous
     uop vect1 consume 0 quads n /quad * + quad!
     bytes n new-vect {: vect :}
     vect vects n th !
-    vect vsp @ ! ;
+    vect vsp @ !
+    1 trace-cost +! ;
 
 : genv-unary ( "name" "codegen" "type" "word" -- )
     type?exit :
@@ -354,7 +363,8 @@ previous
     uop vect1 consume sindex quads n /quad * + quad!
     bytes n new-vect {: vect :}
     vect vects n th !
-    vect vsp @ ! ;
+    vect vsp @ !
+    2 trace-cost +! ;
 
 : genvs ( "name" "codegen" "type" "word" -- )
     type?exit :
