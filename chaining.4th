@@ -174,7 +174,7 @@ include genc.4th
 	cr ."   Cell n" i .n ."  = ns[" i .n ." ];" loop
     nrscalars @ 0 ?do
 	cr ."   Float r" i .n ."  = rs[" i .n ." ];" loop
-    cr ."   for (i=0; i<bytes; i+=sizeof(vb)) {"
+    cr ."   for (i=0; i*sizeof(vb)<bytes; i++) {"
     max-inputs ninputs @ ?do
 	cr ."     vb v" i .n ."  = pv" i .n ." [i];" loop
     nquads @ max-inputs ?do
