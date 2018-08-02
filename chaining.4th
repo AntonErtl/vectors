@@ -112,6 +112,11 @@ $4000 constant quad-result-mask \ bit is set if the result needs to be written
 	vect vect-data free throw vect free throw
     then ;
 
+also c-lib
+: >c ( ... xt -- )
+    >string-execute 2dup write-c-prefix-line drop free throw ;
+previous
+
 \ C code generators for vector words
 
 : binary-c-inputs ( quadp -- n2 n1 )
@@ -157,15 +162,12 @@ include genc.4th
 	    quads i /quad * + l@ 0 6 0 do # loop 2drop
 	loop ;] #36 base-execute 't' hold 0 0 #> ;
 
-: trace-code ( -- )
+: trace-code {: d: tname -- :}
     \ code generation for the trace
-    trace-name save-mem {: tname :}
     cr ." void " tname type ." (Vect *vs[], Cell ns[], Float rs[], long bytes) {"
     cr ."   long i;
     max-inputs ninputs @ ?do
-	vects i th @ vect-data if
-	    cr ."   vb *pv" i .n ."  = vs[" i .n ." ]->vect_data;" then
-    loop
+	cr ."   vb *pv" i .n ."  = vs[" i .n .\" ]->vect_data; printf(\"\\nvs[i]=%p pv" i .n .\" =%p\",vs[" i .n .\" ], pv" i .n ." );" loop
     nquads @ max-inputs ?do
 	quads i /quad * + quad-result  if
 	    cr ."   vb *pv" i .n ."  = vs[" i .n ." ]->vect_data;" then
@@ -184,12 +186,59 @@ include genc.4th
     loop
     .\" \n  }\n}" ;
 
+: c-code {: d: tname -- :}
+    cr ." #define SIMD_SIZE " simd-size dec.
+    cr ." #include <stddef.h>"
+    cr ." #include <stdlib.h>"
+    cr ." #include <stdint.h>"
+    cr ." #include <stdio.h>"
+    cr ." typedef  int8_t   sb;"
+    cr ." typedef uint8_t  sub;"
+    cr ." typedef  int16_t  sw;"
+    cr ." typedef uint16_t suw;"
+    cr ." typedef  int32_t  sl;"
+    cr ." typedef uint32_t sul;"
+    cr ." typedef  int64_t  sx;"
+    cr ." typedef uint64_t sux;"
+    cr ." typedef   float  ssf;"
+    cr ." typedef   double sdf;"
+    cr ." typedef  int8_t   vb __attribute__ ((vector_size (SIMD_SIZE)));" 
+    cr ." typedef uint8_t  vub __attribute__ ((vector_size (SIMD_SIZE)));"
+    cr ." typedef  int16_t  vw __attribute__ ((vector_size (SIMD_SIZE)));" 
+    cr ." typedef uint16_t vuw __attribute__ ((vector_size (SIMD_SIZE)));" 
+    cr ." typedef  int32_t  vl __attribute__ ((vector_size (SIMD_SIZE)));" 
+    cr ." typedef uint32_t vul __attribute__ ((vector_size (SIMD_SIZE)));" 
+    cr ." typedef  int64_t  vx __attribute__ ((vector_size (SIMD_SIZE)));" 
+    cr ." typedef uint64_t vux __attribute__ ((vector_size (SIMD_SIZE)));" 
+    cr ." typedef   float  vsf __attribute__ ((vector_size (SIMD_SIZE)));" 
+    cr ." typedef   double vdf __attribute__ ((vector_size (SIMD_SIZE)));"
+    cr ." typedef long Cell;"
+    cr ." typedef double Float;"
+    cr ." typedef struct {"
+    cr ." Cell vect_refs;"
+    cr ." Cell vect_bytes;"
+    cr ." vb *vect_data;"
+    cr ." char vect_traceentry;"
+    cr ." } Vect;"
+    tname trace-code ;
+
+also c-lib
+: trace-c-function ( tname -- )
+    [: 2dup type space type ."  a a a n -- void" ;] >string-execute
+    2dup ['] c-function execute-parsing drop free throw ;
+previous
+
+: trace-libcc ( -- xt )
+    trace-name save-mem {: d: tname :}
+    tname ['] c-library execute-parsing
+    tname ['] c-code >c
+    tname trace-c-function
+    end-c-library
+    tname find-name name>interpret ;
+
 : finish-trace ( -- )
+    nquads @ max-inputs = ?exit
     print-trace
-    max-inputs ninputs @ +do
-	vects i th @ dup vect-refs @ -1 = if
-	    dup vect-data free throw dup free throw then
-	drop loop
     nquads @ max-inputs +do
 	vects i th @ dup vect-refs @ -1 = if
 	    dup vect-data free throw free throw
@@ -199,7 +248,11 @@ include genc.4th
 	    quads i /quad * + set-quad-result
 	then
     loop
-    trace-code
+    vects xscalars rscalars trace-bytes @ trace-libcc dup xt-see execute
+    max-inputs ninputs @ +do
+	vects i th @ dup vect-refs @ -1 = if
+	    dup vect-data free throw dup free throw then
+	drop loop
     0 nrscalars ! 0 nxscalars ! max-inputs ninputs ! max-inputs nquads ! ;
 
 \ vector word definers

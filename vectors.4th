@@ -249,8 +249,8 @@ s" vector length mismatch" exception constant vectlen-ex
     dup hex. \ 16 ['] u. 16 base-execute
     [defined] use-refcount [if] ." refs=" dup vect-refs @ 2 .r [then]
     ."  bytes=" dup vect-bytes @ 2 .r
-    space '=' '0' rot vect-data select emit ;
-
+    space \ '=' '0' rot vect-data select emit ;
+    vect-data hex. ;
 
 : vect. ( vect -- )
     cr dup vect.short
