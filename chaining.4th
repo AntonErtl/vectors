@@ -232,21 +232,25 @@ include genc.4th
 
 table constant traces \ contains all the chain words generated in this session
 
+: binary-trace-name ( -- c-addr u )
+    [ quads max-inputs /quad * + ] literal quads nquads @ /quad * + over - ;
+
 also c-lib
 : trace-c-function ( tname -- )
-    [: 2dup type space type ."  a a a n -- void" ;] >string-execute
+    [: type ."  a a a n -- void" ;] >string-execute
+    binary-trace-name nextname
     2dup ['] c-function traces ['] execute-parsing current-execute drop free throw ;
 previous
 
 : trace-libcc ( -- xt )
-    trace-name save-mem {: d: tname :}
-    tname traces find-name-in dup 0= if
+    binary-trace-name traces find-name-in dup 0= if
 	drop
+	trace-name save-mem {: d: tname :}
 	tname ['] c-library execute-parsing
 	tname ['] c-code >c
 	tname trace-c-function
 	end-c-library
-	tname traces find-name-in
+	binary-trace-name traces find-name-in
     then
     name>interpret ;
 
