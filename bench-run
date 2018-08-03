@@ -1,0 +1,16 @@
+#: "${SIMD_SIZE:=32}"
+#: "${COUNTER=cycles:u}"
+TIMER="perf stat -x' ' -e cycles:u"
+#TIMER="perf stat -x' ' -e cycles:u -e instructions:u"
+for SIMD_SIZE in 32 16; do
+  for COUNTER in cycles:u instructions:u; do
+    for USE in simple vaxpy vaxpy2 chaining; do
+      echo '%' $USE $SIMD_SIZE $COUNTER
+      for i in 0001 0100 0200 0300 0400 0500 1000 1500 2000 2500 3000 3500 4000 4500 5000 5500 6000 6500 7000 7500 8000; do
+      #for i in 0001 0100; do # 0200 0300 0400 0500 0600 0700 0800 0900 1000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000; do
+        echo -n "$i vectlen "
+        perf stat -x' ' -e $COUNTER ~/gforth/gforth-fast -e "warnings off $SIMD_SIZE constant simd-size $i constant vectlen 1 constant use-$USE" vmatmul.4th benchn.4th -e bye
+      done
+    done
+  done
+done

@@ -289,7 +289,8 @@ previous
     \ If not, or if the cost is too large, finish the trace and start
     \ a new one
     trace-bytes @ over = if
-	trace-cost @ max-trace-cost < if
+	\ trace-cost @ max-trace-cost < if
+	nquads @ 32 < if
 	    drop exit then then
     nquads @ max-inputs <> if \ there is at least one quad in the trace
 	finish-trace then
