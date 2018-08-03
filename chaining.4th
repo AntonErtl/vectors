@@ -83,8 +83,12 @@ $4000 constant quad-result-mask \ bit is set if the result needs to be written
     max-inputs ninputs @ +do
 	cr 17 spaces vects i th @ vect.short ."  :" i 2 .r loop
     nquads @ max-inputs +do
-	cr quads i /quad * + quad. space
-	vects i th @ vect.short ."  :" i 2 .r loop
+	cr quads i /quad * + dup quad. space
+	quad-result if
+	    vects i th @ vect.short
+	else
+	    ." temporary                            " then
+	."  :" i 2 .r loop
     cr ." trace-cost =" trace-cost @ . ;
 
 : in-trace? {: vect -- f :}
@@ -94,6 +98,10 @@ $4000 constant quad-result-mask \ bit is set if the result needs to be written
     false ;
 
 \ replacement words
+
+c-library aligned_alloc
+    c-function aligned_alloc aligned_alloc u u -- a
+end-c-library
 
 : vect-data-alloc ( u -- addr )
     vector-granularity tuck naligned aligned_alloc dup 0= -59 and throw ;
@@ -246,6 +254,7 @@ previous
     binary-trace-name traces find-name-in dup 0= if
 	drop
 	trace-name save-mem {: d: tname :}
+	\ cr tname type print-trace
 	tname ['] c-library execute-parsing
 	tname ['] c-code >c
 	tname trace-c-function
@@ -256,7 +265,6 @@ previous
 
 : finish-trace ( -- )
     nquads @ max-inputs = ?exit
-    \ print-trace
     nquads @ max-inputs +do
 	vects i th @ dup vect-refs @ -1 = if
 	    dup vect-data free throw free throw
