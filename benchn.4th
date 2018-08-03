@@ -18,13 +18,13 @@
     loop
     drop ;
 
-100 constant dim
+50 constant dim
 dim dup     * floats allocate throw constant a a dim     dim     1 init-matrix
 dim vectlen * floats allocate throw constant b b vectlen dim 30000 init-matrix
 dim vectlen * floats allocate throw constant c
 
 : bench
-    200 0 do
+    500 0 do
 	a b c dim dim vectlen matmulr
     loop ;
 bench
