@@ -39,6 +39,41 @@ synonym f+v df+v
     : f*+vvs ]] f*vs f+v [[ ; immediate
 [then]    
 
+
+[defined] use-blocking [if]
+    defer matmulrr
+
+    : matmulr1 {: a b1 c1 n2orig offset1 offset2 n1 n2 -- :}
+	assert( n1 n2 >= )
+	n1 1 = if
+	    c1 offset1 th dup v@'
+	    b1 offset2 th v@ a offset1 n2orig * offset2 + dfloats + df@ f*+vvs
+	    v! exit then
+	n1 2/ {: n1' :}
+	a b1 c1 n2orig offset1       offset2 n1'      n2 matmulrr
+	a b1 c1 n2orig offset1 n1' + offset2 n1 n1' - n2 matmulrr ;
+
+    : matmulr2 {: a b1 c1 n2orig offset1 offset2 n1 n2 -- :}
+	assert( n2 1 > )
+	n2 2/ {: n2' :}
+	a b1 c1 n2orig offset1 offset2       n1 n2'      matmulrr
+	a b1 c1 n2orig offset1 offset2 n2' + n1 n2 n2' - matmulrr ;
+
+    :noname ( a b1 c1 n2orig offset1 offset2 n1 n2 -- )
+	2dup < if
+	    matmulr2 exit then
+	matmulr1 ;
+    is matmulrr
+    
+    : matmulr {: a b c n1 n2 n3 | b1 c1 -- :}
+	\ C = A x B, where A has n1 rows and n2 columns,
+	\ B has n2 rows and n3 columns, and C has n1 rows and n3 columns
+	n2 cells allocate throw to b1 b1 n2 cells erase b1 n2 n3 b mat@
+	c n1 n3 * dfloats erase
+	n1 cells allocate throw to c1 c1 n1 cells erase c1 n1 n3 c mat@
+	a b1 c1 n2 0 0 n1 n2 matmulrr
+	c1 n1 n3 c mat! ;
+[else]
 : matmulr {: a b c n1 n2 n3 | b1 c1 -- :}
     \ C = A x B, where A has n1 rows and n2 columns,
     \ B has n2 rows and n3 columns, and C has n1 rows and n3 columns
@@ -62,3 +97,4 @@ synonym f+v df+v
 	v!
     loop
     c1 n1 n3 c mat! ;
+[then]
