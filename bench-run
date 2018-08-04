@@ -6,14 +6,14 @@ BLOCKING=
 for SIMD_SIZE in 32 16; do
   for USE in simple vaxpy vaxpy2 chaining; do
   #for USE in simple vaxpy chaining; do
-    ~/gforth/gforth-fast -e "warnings off $SIMD_SIZE constant simd-size 1 constant vectlen 1 constant use-$USE 1 constant use-refcount $BLOCKING" vmatmul.4th benchn.4th -e bye
+    ~/gforth/gforth-fast -e "0 assert-level ! warnings off $SIMD_SIZE constant simd-size 1 constant vectlen 1 constant use-$USE 1 constant use-refcount $BLOCKING" vmatmul.4th benchn.4th -e bye
     echo '%' $USE $SIMD_SIZE
     echo startline
     #for i in 0001 0100 0200 0300 0400 0500 600 700 800 900 1000 1500 2000 2500 3000; do
     for i in 0001 0100 0200 0300 0400 0500 1000 1500 2000 3000 4000 5000 6000 7000 8000 9000 10000 11000 12000; do
     #for i in 0001 0100; do # 0200 0300 0400 0500 0600 0700 0800 0900 1000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000; do
       echo -n "$i "
-      perf stat -x' ' -e cycles:u -e instructions:u ~/gforth/gforth-fast -e "warnings off $SIMD_SIZE constant simd-size $i constant vectlen 1 constant use-$USE 1 constant use-refcount $BLOCKING" vmatmul.4th benchn.4th -e bye 2>&1|awk '{printf("%s %s ",$1,$2);}'
+      perf stat -x' ' -e cycles:u -e instructions:u ~/gforth/gforth-fast -e "0 assert-level ! warnings off $SIMD_SIZE constant simd-size $i constant vectlen 1 constant use-$USE 1 constant use-refcount $BLOCKING" vmatmul.4th benchn.4th -e bye 2>&1|awk '{printf("%s %s ",$1,$2);}'
       echo
     done
     echo "($USE) label"

@@ -153,7 +153,7 @@ previous
 
 : genv-vs-c ( "name" "vtype" "stypef" "forth-code\n" -- )
     ncgens @ constant latest parse-name save-mem to t
-    parse-name dup assert( 1 = ) drop c@ dup to s
+    parse-name assert( dup 1 = ) drop c@ dup to s
     :noname ( quadp -- ) ]] binary-c-inputs [[ -1 parse evaluate ]] ; [[
     current-cgen tuck cgen-xt ! tuck cgen-stype c! cgen-nt ! 1 ncgens +! ;
 
