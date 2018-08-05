@@ -94,9 +94,9 @@ create g
     72e df,     79e df,     86e df,     93e df, 
    112e df,    123e df,    134e df,    145e df, 
 
-\ c 3 3 mat.
+c 3 3 mat.
 
-\ f 4 3 mat.
+f 4 3 mat.
 
 T{ c 9 dfloats d 9 dfloats compare -> 0 }T
 T{ f 12 dfloats g 12 dfloats compare -> 0 }T

@@ -123,6 +123,25 @@ end-c-library
 	vect vect-data free throw vect free throw
     then ;
 
+\ trace data reuse (all the same size)
+
+create free-vdata max-trace cells allot \ cache of free vector data
+variable nfree-vdata 0 nfree-vdata
+
+: trace-data-alloc ( -- addr )
+    nfree-vdata @ dup if
+	1- dup nfree-vdata ! cells free-vdata + @ exit then
+    drop trace-bytes @ vect-data-alloc ;
+
+: trace-data-free ( addr -- )
+    free-vdata nfree-vdata @ dup 1+ nfree-vdata ! th ! ;
+
+: trace-data-end ( -- )
+    \ actually free the remaining data
+    nfree-vdata @ 0 ?do
+	free-vdata i th @ free throw loop
+    0 nfree-vdata ! ;
+
 also c-lib
 : >c ( ... xt -- )
     >string-execute 2dup write-c-prefix-line drop free throw ;
@@ -265,22 +284,27 @@ previous
 
 : finish-trace ( -- )
     nquads @ max-inputs = ?exit
+    max-inputs ninputs @ +do
+	vects i th @ dup vect-refs @ -1 = if
+	    dup vect-data trace-data-free then
+	drop loop
     nquads @ max-inputs +do
 	vects i th @ dup vect-refs @ -1 = if
-	    dup vect-data free throw free throw
+	    assert( dup vect-data 0= )
+	    ( dup vect-data free throw ) free throw
 	else
 	    assert( dup vect-data 0= )
-	    dup vect-bytes @ vect-data-alloc swap vect-datap !
+	    trace-data-alloc swap vect-datap !
 	    quads i /quad * + set-quad-result
 	then
     loop
     vects xscalars rscalars trace-bytes @ trace-libcc execute
     max-inputs ninputs @ +do
 	vects i th @ dup vect-refs @ -1 = if
-	    dup vect-data free throw dup free throw then
+	    dup free throw then
 	drop loop
     0 nrscalars ! 0 nxscalars ! max-inputs ninputs ! max-inputs nquads !
-    0 trace-cost ! ;
+    0 trace-cost ! trace-data-end ;
 
 \ vector word definers
 
