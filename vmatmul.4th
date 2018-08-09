@@ -101,19 +101,19 @@ synonym f+v df+v
 	    c1 dup v@'
 	    [undefined] use-vaxpy2 [if]
 		n2 0 ?do
-		    b1 v@ a j n2 * dfloats + ~~ df@ f*+vvs
+		    b1 i th v@ a i dfloats + df@ f*+vvs
 		loop
 	    [else]
 		n2 1 and if
-		    b1 v@  a j n2 * dfloats + df@ f*+vvs then
+		    b1 v@  a df@ f*+vvs then
 		n2 n2 1 and ?do
-		    b1 v@  b1 1 th v@
-		    a j n2 * dfloats + dup df@ dfloat+ df@ f*+*+vvvss
+		    b1 i th v@  b1 i 1+ th v@
+		    a i dfloats + dup df@ dfloat+ df@ f*+*+vvvss
 		2 +loop
 	    [then]
 	    v!
 	then
-	n1 0 ?do
+	n1 n1 1 and ?do
 	    c1 i th dup v@' dup cell+ v@'  
 	    [undefined] use-vaxpy2 [if]
 		n2 0 ?do ( addr vc[i] vc[i+1] )
@@ -122,8 +122,8 @@ synonym f+v df+v
 		loop
 	    [else]
 		n2 1 and if
-		    vswap b1 v@ a j    n2 * dfloats + df@ f*+vvs
-		    vswap b1 v@ a j 1+ n2 * dfloats + df@ f*+vvs
+		    vswap b1 v@ a i    n2 * dfloats + df@ f*+vvs
+		    vswap b1 v@ a i 1+ n2 * dfloats + df@ f*+vvs
 		then
 		n2 n2 1 and ?do
 		    vswap b1 i th v@  b1 i 1+ th v@
