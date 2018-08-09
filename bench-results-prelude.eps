@@ -1,0 +1,103 @@
+%!PS-Adobe-2.0 EPSF-1.2
+%%BoundingBox: 8 68 324 390
+%%Pages: 1 1
+%%DocumentFonts: Helvetica
+%%EndComments
+/drop {pop} def
+/swap {exch} def
+/nip {swap drop} def
+/2dup {2 copy} def
+/rot {3 -1 roll} def
+/xtf {0.02 mul 30 add} def
+/ymax 30303176499 def
+/ytf {ymax div 300 mul 80 add} def
+/tf {exch xtf exch ytf} def
+/mt {tf moveto} def
+%/lt {dup 8000000000 le {tf lineto}{drop drop} ifelse} def
+/lt {tf lineto} def
+/scalefactor 91732509 def
+/xbase 1 def
+/ytop 30000000000 def
+/ybase 0 def
+1 setlinejoin
+1 setlinecap
+0 0 translate
+newpath /Helvetica findfont 9 scalefont setfont
+/label {2 -3 rmoveto show stroke} def
+%median3 x1 x2 x3 -- x4
+/median3 { 2dup gt { swap } if          %x1 x< x>
+                rot 2dup gt { swap } if drop %x<_1 x<_2
+                2dup gt { swap } if nip
+} def
+%1 2 3 median3 =
+%2 1 3 median3 =
+%1 3 2 median3 =
+%2 3 1 median3 =
+%3 1 2 median3 =
+%3 2 1 median3 =                
+/colors [
+	 {0   0   0  }
+  	 {1   0  0 }
+	 {0   0.7  0 }
+	 {0   0  1 }
+         {0.8 0   0  }
+         {0.9 0   0  }
+         {0   0  1 }
+         {0.5 0.5 1  }
+         {0.3 0.3 1  }
+	 {0   0.7 0}
+	 {0 1 0}
+	 {0   0   0  }
+	 {0.7 0  0.7}
+	 {1 0 1}
+	 {0.6 0.6 0.6}
+	 {0.4 0.4 0.4}
+	 {0.7 0.4 0}
+	 {0   0.4 0.7}
+         {0   0.7 0  }
+         {1   0   0  }
+         {1   0.6 0.6}
+         {0   0   1  }
+
+         {0   0  1 }
+	 {0.7 0  0.7}
+  	 {1   0  0 }
+	 {0.7 0.4 0}
+	 {0   0.7 0}
+	 {0   0.4 0.7}
+         {0.4 0.4 0.4}
+         {0   0.7 0  }
+         {1   0   0  }
+         {0.6 0.6 1  }
+         {1   0.6 0.6}
+         {0.8 0   0  }
+         {0.9 0   0  }
+         {0   0   1  }
+         {0   0   0  }
+         {0   0  1 }
+	 {0.7 0  0.7}
+  	 {1   0  0 }
+	 {0.7 0.4 0}
+	 {0   0.7 0}
+	 {0   0.4 0.7}
+         {0.4 0.4 0.4}
+         {0   0.7 0  }
+         {1   0   0  }
+         {0.6 0.6 1  }
+         {1   0.6 0.6}
+         {0.8 0   0  }
+         {0.9 0   0  }
+         {0   0   1  }] def
+/setncolor {colors swap get exec setrgbcolor} def
+
+/startline {dup setncolor 1 add /mlt {mt /mlt {lt} def} def} def
+
+/cycles:u {mlt} def
+/instructions:u {drop} def
+/LLC-loads {drop} def
+/LLC-stores {drop} def
+
+0.3 setlinewidth
+[] 0 setdash
+
+0

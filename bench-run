@@ -1,8 +1,9 @@
 #: "${SIMD_SIZE:=32}"
 TIMER="perf stat -x' ' -e cycles:u"
 #TIMER="perf stat -x' ' -e cycles:u -e instructions:u"
-BLOCKING=
-#BLOCKING="create use-blocking"
+#BLOCKING=
+BLOCKING="create use-blocking"
+cat bench-results-prelude.eps
 for SIMD_SIZE in 32; do
 #for SIMD_SIZE in 32 16; do
   for USE in simple vaxpy vaxpy2 chaining; do
@@ -20,3 +21,4 @@ for SIMD_SIZE in 32; do
     echo "($USE) label"
   done
 done
+cat bench-results-postlude.eps

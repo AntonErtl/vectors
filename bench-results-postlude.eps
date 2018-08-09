@@ -1,0 +1,61 @@
+
+/xright 12000 def
+
+[] 0 setdash
+0 setgray
+0.5 setlinewidth
+xbase ytop mt
+xbase ybase tf lineto
+xright ybase tf lineto
+stroke
+
+/xjright {dup stringwidth pop neg 0 rmoveto} def
+/xjcenter {dup stringwidth pop 2 div neg 0 rmoveto} def
+/yjtop {0 -7 rmoveto} def
+/yjcenter {0 -3.5 rmoveto} def
+
+xright ybase mt 2 1 rmoveto (vector length) yjcenter show
+xbase ytop mt 0 7 rmoveto (cycles) xjcenter show
+
+
+/ticklength -2 def
+%x str xtick[12]
+%/xtick { exch ybase mt 0 ticklength rlineto 0 -2 rmoveto
+%         gsave 0.8 0.8 scale xjcenter yjtop show grestore} def
+/str 20 string def
+
+
+%x xtick
+/xtick { dup ybase mt 0 -2 rlineto 0 -2 rmoveto str cvs xjcenter yjtop show } def
+1 xtick
+%2 xtick
+%3 xtick
+%4 xtick
+%7 xtick
+%8 xtick
+1000 xtick
+3000 xtick
+6000 xtick
+9000 xtick
+12000 xtick
+%3000 xtick
+
+%/ytick { dup 1 exch div scalefactor mul xbase exch mt -2 0 rlineto -2 0 rmoveto str cvs xjright
+%   yjcenter show } def
+%1 ytick
+%0.5 ytick
+%0.2 ytick
+%0.1 ytick
+%0.05 ytick
+/ytick { xbase exch mt -2 0 rlineto -2 0 rmoveto xjright
+   yjcenter show } def
+(0G) 0000000000 ytick
+(2G) 2000000000 ytick
+(5G) 5000000000 ytick
+(10G) 10000000000 ytick
+%(15G) 4000000000 ytick
+(20G) 20000000000 ytick
+(30G) 30000000000 ytick
+%(7G) 7000000000 ytick
+%1.5 ytick
+stroke

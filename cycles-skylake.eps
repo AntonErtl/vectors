@@ -1,0 +1,252 @@
+%!PS-Adobe-2.0 EPSF-1.2
+%%BoundingBox: 8 68 324 390
+%%Pages: 1 1
+%%DocumentFonts: Helvetica
+%%EndComments
+/drop {pop} def
+/swap {exch} def
+/nip {swap drop} def
+/2dup {2 copy} def
+/rot {3 -1 roll} def
+/xtf {0.02 mul 30 add} def
+/ymax 30303176499 def
+/ytf {ymax div 300 mul 80 add} def
+/tf {exch xtf exch ytf} def
+/mt {tf moveto} def
+%/lt {dup 8000000000 le {tf lineto}{drop drop} ifelse} def
+/lt {tf lineto} def
+/scalefactor 91732509 def
+/xbase 1 def
+/ytop 30000000000 def
+/ybase 0 def
+1 setlinejoin
+1 setlinecap
+0 0 translate
+newpath /Helvetica findfont 9 scalefont setfont
+/label {2 -3 rmoveto show stroke} def
+%median3 x1 x2 x3 -- x4
+/median3 { 2dup gt { swap } if          %x1 x< x>
+                rot 2dup gt { swap } if drop %x<_1 x<_2
+                2dup gt { swap } if nip
+} def
+%1 2 3 median3 =
+%2 1 3 median3 =
+%1 3 2 median3 =
+%2 3 1 median3 =
+%3 1 2 median3 =
+%3 2 1 median3 =                
+/colors [
+	 {0   0   0  }
+  	 {1   0  0 }
+	 {0   0.7  0 }
+	 {0   0  1 }
+         {0.8 0   0  }
+         {0.9 0   0  }
+         {0   0  1 }
+         {0.5 0.5 1  }
+         {0.3 0.3 1  }
+	 {0   0.7 0}
+	 {0 1 0}
+	 {0   0   0  }
+	 {0.7 0  0.7}
+	 {1 0 1}
+	 {0.6 0.6 0.6}
+	 {0.4 0.4 0.4}
+	 {0.7 0.4 0}
+	 {0   0.4 0.7}
+         {0   0.7 0  }
+         {1   0   0  }
+         {1   0.6 0.6}
+         {0   0   1  }
+
+         {0   0  1 }
+	 {0.7 0  0.7}
+  	 {1   0  0 }
+	 {0.7 0.4 0}
+	 {0   0.7 0}
+	 {0   0.4 0.7}
+         {0.4 0.4 0.4}
+         {0   0.7 0  }
+         {1   0   0  }
+         {0.6 0.6 1  }
+         {1   0.6 0.6}
+         {0.8 0   0  }
+         {0.9 0   0  }
+         {0   0   1  }
+         {0   0   0  }
+         {0   0  1 }
+	 {0.7 0  0.7}
+  	 {1   0  0 }
+	 {0.7 0.4 0}
+	 {0   0.7 0}
+	 {0   0.4 0.7}
+         {0.4 0.4 0.4}
+         {0   0.7 0  }
+         {1   0   0  }
+         {0.6 0.6 1  }
+         {1   0.6 0.6}
+         {0.8 0   0  }
+         {0.9 0   0  }
+         {0   0   1  }] def
+/setncolor {colors swap get exec setrgbcolor} def
+
+/startline {dup setncolor 1 add /mlt {mt /mlt {lt} def} def} def
+
+/cycles:u {mlt} def
+/instructions:u {drop} def
+/LLC-loads {drop} def
+/LLC-stores {drop} def
+
+0.3 setlinewidth
+[] 0 setdash
+
+0
+% simple 32
+startline
+00001 751955816 cycles:u 1939977662 instructions:u 280995 LLC-loads 40855 LLC-stores 
+00100 1018342915 cycles:u 2482703082 instructions:u 776986 LLC-loads 1096266 LLC-stores 
+00200 1313718964 cycles:u 2922646952 instructions:u 1166846 LLC-loads 904675 LLC-stores 
+00300 1439891630 cycles:u 3298249255 instructions:u 1868310 LLC-loads 1699723 LLC-stores 
+00400 1546282925 cycles:u 3642496911 instructions:u 3007137 LLC-loads 2823960 LLC-stores 
+00500 1667686104 cycles:u 3998547019 instructions:u 5283606 LLC-loads 3344572 LLC-stores 
+01000 2533905283 cycles:u 5777148668 instructions:u 38714292 LLC-loads 6054426 LLC-stores 
+01500 3649146601 cycles:u 7568727158 instructions:u 48021765 LLC-loads 8472500 LLC-stores 
+02000 4828678383 cycles:u 9347963881 instructions:u 52033696 LLC-loads 10987534 LLC-stores 
+03000 6716354511 cycles:u 12943733370 instructions:u 71897809 LLC-loads 18121261 LLC-stores 
+04000 8538566907 cycles:u 16518062983 instructions:u 98857497 LLC-loads 27124806 LLC-stores 
+05000 10848802925 cycles:u 20088724290 instructions:u 160052205 LLC-loads 40893779 LLC-stores 
+06000 13097680892 cycles:u 23665181900 instructions:u 204497338 LLC-loads 51308632 LLC-stores 
+07000 15878902048 cycles:u 27235355921 instructions:u 282803985 LLC-loads 65061966 LLC-stores 
+08000 18328264425 cycles:u 30805229926 instructions:u 390526355 LLC-loads 73348944 LLC-stores 
+09000 21308539109 cycles:u 34449806629 instructions:u 582786561 LLC-loads 68463569 LLC-stores 
+10000 24628556374 cycles:u 38025980673 instructions:u 762196344 LLC-loads 110175670 LLC-stores 
+11000 27565118045 cycles:u 41602354783 instructions:u 897243063 LLC-loads 151689568 LLC-stores 
+12000 31293567101 cycles:u 45178529447 instructions:u 1040956889 LLC-loads 205319407 LLC-stores 
+(simple) label
+% vaxpy 32
+startline
+00001 283496592 cycles:u 862892118 instructions:u 264184 LLC-loads 33251 LLC-stores 
+00100 390978284 cycles:u 1056094118 instructions:u 425969 LLC-loads 146645 LLC-stores 
+00200 475618703 cycles:u 1261909468 instructions:u 868282 LLC-loads 720929 LLC-stores 
+00300 554576038 cycles:u 1461391908 instructions:u 1520158 LLC-loads 1646378 LLC-stores 
+00400 641286594 cycles:u 1660765327 instructions:u 2006449 LLC-loads 3184397 LLC-stores 
+00500 716360261 cycles:u 1860478836 instructions:u 2972434 LLC-loads 3601538 LLC-stores 
+01000 1218302684 cycles:u 2858082523 instructions:u 24758349 LLC-loads 6189977 LLC-stores 
+01500 1759291669 cycles:u 3855982979 instructions:u 34775796 LLC-loads 8259893 LLC-stores 
+02000 2350281315 cycles:u 4853723233 instructions:u 46848872 LLC-loads 10128598 LLC-stores 
+03000 3684233807 cycles:u 6887237392 instructions:u 70955889 LLC-loads 18350693 LLC-stores 
+04000 4846819491 cycles:u 8898188379 instructions:u 93604179 LLC-loads 26034666 LLC-stores 
+05000 6095164317 cycles:u 10906268319 instructions:u 120642339 LLC-loads 34702463 LLC-stores 
+06000 7450716582 cycles:u 12910987223 instructions:u 148622118 LLC-loads 46036810 LLC-stores 
+07000 8847306817 cycles:u 14918660171 instructions:u 183166597 LLC-loads 55983539 LLC-stores 
+08000 10365780179 cycles:u 16926034662 instructions:u 228342793 LLC-loads 65509349 LLC-stores 
+09000 12291987124 cycles:u 18994717510 instructions:u 313822495 LLC-loads 37588774 LLC-stores 
+10000 14663048759 cycles:u 21008391125 instructions:u 445872341 LLC-loads 42515433 LLC-stores 
+11000 17015639021 cycles:u 23022262981 instructions:u 610118137 LLC-loads 47970012 LLC-stores 
+12000 19746694490 cycles:u 25035935892 instructions:u 774513514 LLC-loads 52045919 LLC-stores 
+(vaxpy) label
+% vaxpy2 32
+startline
+00001 265944847 cycles:u 747725351 instructions:u 285006 LLC-loads 35897 LLC-stores 
+00100 341767347 cycles:u 880932019 instructions:u 442609 LLC-loads 164361 LLC-stores 
+00200 401828100 cycles:u 1024241595 instructions:u 846516 LLC-loads 703313 LLC-stores 
+00300 458982175 cycles:u 1161224317 instructions:u 1603010 LLC-loads 1587984 LLC-stores 
+00400 520974678 cycles:u 1298097543 instructions:u 2085129 LLC-loads 3207925 LLC-stores 
+00500 585574380 cycles:u 1435310925 instructions:u 2963039 LLC-loads 3884770 LLC-stores 
+01000 1005665938 cycles:u 2120414582 instructions:u 17310351 LLC-loads 5862601 LLC-stores 
+01500 1503178831 cycles:u 2805815039 instructions:u 25534873 LLC-loads 7725221 LLC-stores 
+02000 1966910157 cycles:u 3491054870 instructions:u 38886260 LLC-loads 10775557 LLC-stores 
+03000 2954960539 cycles:u 4899569587 instructions:u 49339449 LLC-loads 17507326 LLC-stores 
+04000 3861075608 cycles:u 6285472296 instructions:u 66377321 LLC-loads 25236701 LLC-stores 
+05000 4986963736 cycles:u 7668551358 instructions:u 98627612 LLC-loads 36327322 LLC-stores 
+06000 6167054895 cycles:u 9048319046 instructions:u 137564346 LLC-loads 46543307 LLC-stores 
+07000 7446173833 cycles:u 10430991992 instructions:u 185384009 LLC-loads 56181013 LLC-stores 
+08000 8707446017 cycles:u 11813365154 instructions:u 232329405 LLC-loads 65174479 LLC-stores 
+09000 10750399942 cycles:u 13257005661 instructions:u 337092100 LLC-loads 38229973 LLC-stores 
+10000 12702165517 cycles:u 14645680423 instructions:u 437036607 LLC-loads 42201604 LLC-stores 
+11000 14350554674 cycles:u 16034551623 instructions:u 506457595 LLC-loads 46589630 LLC-stores 
+12000 16148449025 cycles:u 17423231031 instructions:u 579565837 LLC-loads 50965649 LLC-stores 
+(vaxpy2) label
+% chaining 32
+startline
+00001 1201940277 cycles:u 3731197885 instructions:u 167897 LLC-loads 28005 LLC-stores 
+00100 1257388195 cycles:u 3840855305 instructions:u 402744 LLC-loads 211705 LLC-stores 
+00200 1363291797 cycles:u 3962122828 instructions:u 906806 LLC-loads 829403 LLC-stores 
+00300 1444313171 cycles:u 4066318500 instructions:u 1232532 LLC-loads 1917029 LLC-stores 
+00400 1444860080 cycles:u 4176864305 instructions:u 1819462 LLC-loads 3015262 LLC-stores 
+00500 1522764598 cycles:u 4286707706 instructions:u 2833672 LLC-loads 3588921 LLC-stores 
+01000 1830778946 cycles:u 4838077724 instructions:u 7894553 LLC-loads 6970054 LLC-stores 
+01500 2120501933 cycles:u 5390608962 instructions:u 10307435 LLC-loads 9304135 LLC-stores 
+02000 2461703786 cycles:u 5941121346 instructions:u 14800605 LLC-loads 13096226 LLC-stores 
+03000 3177088235 cycles:u 7082670942 instructions:u 19661963 LLC-loads 18961229 LLC-stores 
+04000 3930631602 cycles:u 8197920499 instructions:u 29001907 LLC-loads 27715413 LLC-stores 
+05000 4902492941 cycles:u 9313300512 instructions:u 47867275 LLC-loads 40197466 LLC-stores 
+06000 5851460293 cycles:u 10428842551 instructions:u 62146073 LLC-loads 49081159 LLC-stores 
+07000 6769765729 cycles:u 11544390412 instructions:u 74243094 LLC-loads 58164175 LLC-stores 
+08000 7848968359 cycles:u 12659629270 instructions:u 89169035 LLC-loads 67648448 LLC-stores 
+09000 9013135864 cycles:u 13835676339 instructions:u 89849137 LLC-loads 39506639 LLC-stores 
+10000 10109462394 cycles:u 14957179283 instructions:u 104966058 LLC-loads 43980895 LLC-stores 
+11000 11210099101 cycles:u 16078913980 instructions:u 117122641 LLC-loads 47998453 LLC-stores 
+12000 12258863251 cycles:u 17200449152 instructions:u 125308621 LLC-loads 52573779 LLC-stores 
+(chaining) label
+
+/xright 12000 def
+
+[] 0 setdash
+0 setgray
+0.5 setlinewidth
+xbase ytop mt
+xbase ybase tf lineto
+xright ybase tf lineto
+stroke
+
+/xjright {dup stringwidth pop neg 0 rmoveto} def
+/xjcenter {dup stringwidth pop 2 div neg 0 rmoveto} def
+/yjtop {0 -7 rmoveto} def
+/yjcenter {0 -3.5 rmoveto} def
+
+xright ybase mt 2 1 rmoveto (vector length) yjcenter show
+xbase ytop mt 0 7 rmoveto (cycles) xjcenter show
+
+
+/ticklength -2 def
+%x str xtick[12]
+%/xtick { exch ybase mt 0 ticklength rlineto 0 -2 rmoveto
+%         gsave 0.8 0.8 scale xjcenter yjtop show grestore} def
+/str 20 string def
+
+
+%x xtick
+/xtick { dup ybase mt 0 -2 rlineto 0 -2 rmoveto str cvs xjcenter yjtop show } def
+1 xtick
+%2 xtick
+%3 xtick
+%4 xtick
+%7 xtick
+%8 xtick
+1000 xtick
+3000 xtick
+6000 xtick
+9000 xtick
+12000 xtick
+%3000 xtick
+
+%/ytick { dup 1 exch div scalefactor mul xbase exch mt -2 0 rlineto -2 0 rmoveto str cvs xjright
+%   yjcenter show } def
+%1 ytick
+%0.5 ytick
+%0.2 ytick
+%0.1 ytick
+%0.05 ytick
+/ytick { xbase exch mt -2 0 rlineto -2 0 rmoveto xjright
+   yjcenter show } def
+(0G) 0000000000 ytick
+(2G) 2000000000 ytick
+(5G) 5000000000 ytick
+(10G) 10000000000 ytick
+%(15G) 4000000000 ytick
+(20G) 20000000000 ytick
+(30G) 30000000000 ytick
+%(7G) 7000000000 ytick
+%1.5 ytick
+stroke
