@@ -103,11 +103,21 @@ c-library aligned_alloc
     c-function aligned_alloc aligned_alloc u u -- a
 end-c-library
 
+variable vect-free-list 0 vect-free-list
+
+: /vect-alloc ( -- addr )
+    vect-free-list @ dup if
+	dup @ vect-free-list ! exit then
+    drop /vect allocate throw ;
+
+: /vect-free ( addr -- )
+    vect-free-list @ over ! vect-free-list ! ;
+
 : vect-data-alloc ( u -- addr )
     vector-granularity tuck naligned aligned_alloc dup 0= -59 and throw ;
 
 : vect-alloc ( u -- vect )
-    /vect allocate throw >r
+    /vect-alloc >r
     dup vect-data-alloc r@ vect-datap !
     [defined] use-refcount [if]
 	0 r@ vect-refs !
@@ -120,10 +130,19 @@ end-c-library
 	vect vect-refs @ assert( dup 0>= ) dup if
 	    1- vect vect-refs ! exit then
 	drop vect in-trace? ?exit
-	vect vect-data free throw vect free throw
+	vect vect-data free throw vect /vect-free
     then ;
 
 \ trace data reuse (all the same size)
+
+\ During the trace code, all the loads for each iteration are
+\ performed before all the stores; therefore the vect-data freed by
+\ the trace can be used for storing the results.  The following code
+\ achieves this: TRACE-DATA-FREE is called before the trace code, but
+\ the data lives until the trace code; TRACE-DATA-ALLOC is also called
+\ before, and reused the "freed" vect-data if possible (also useful
+\ for cache performance).  If there are any free blocks left over,
+\ they are freed by TRACE-DATA-END after the trace code was executed.
 
 create free-vdata max-trace cells allot \ cache of free vector data
 variable nfree-vdata 0 nfree-vdata
@@ -197,6 +216,8 @@ include genc.4th
     cr ." void " tname type ." (Vect *vs[], Cell ns[], Float rs[], long bytes) {"
     cr ."   long i;
     max-inputs ninputs @ ?do
+	\ all loads per iteration must happen before all stores;
+	\ memory management by TRACE-DATA-FREE etc. relies on this
 	cr ."   vb *pv" i .n ."  = vs[" i .n .\" ]->vect_data; /* printf(\"\\nvs[i]=%p pv" i .n .\" =%p\",vs[" i .n .\" ], pv" i .n ." ); */" loop
     nquads @ max-inputs ?do
 	quads i /quad * + quad-result  if
@@ -286,6 +307,8 @@ previous
     nquads @ max-inputs = ?exit
     max-inputs ninputs @ +do
 	vects i th @ dup vect-refs @ -1 = if
+	    \ mark vect-data for reuse by TRACE-DATA-ALLOC, or freeing
+	    \ by TRACE-DATA-END
 	    dup vect-data trace-data-free then
 	drop loop
     nquads @ max-inputs +do

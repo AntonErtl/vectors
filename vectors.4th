@@ -260,9 +260,9 @@ s" vector length mismatch" exception constant vectlen-ex
     drop ;
 
 : v.s ( -- )
-    vect-stack vect-stack-items th vsp @ ?do
-	i @ vect.short
-    1 cells +loop ;
+     vsp @ vect-stack vect-stack-items th cell- ?do
+	i @ vect.short 2 spaces
+    -1 cells +loop ;
 
 \ locals are used in the gen-...-inner words, to avoid needing to know
 \ the stack effect of the type-@ words.  This necessitates EVALUATE,
@@ -820,6 +820,12 @@ s" vector length mismatch" exception constant vectlen-ex
 
 : vrot ( v1 v2 v3 -- v2 v3 v1 )
     vsp @ dup >r 2@ r@ [ 2 cells ] literal + @ r@ ! r> cell+ 2! ;
+
+: v-rot ( v1 v2 v3 -- v3 v1 v2 )
+    vsp @ dup >r @ r@ cell+ 2@ r@ 2! r> [ 2 cells ] literal + ! ;
+
+: vtuck ( v1 v2 -- v2 v1 v2 )
+    vswap vover ;
 
 : vroll ( vu ... v0 u -- vu-1 .. v1 vu )
     cells >r vsp @ dup r@ + @ swap ( vectu addr r:ucells )

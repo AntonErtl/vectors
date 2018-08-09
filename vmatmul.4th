@@ -117,8 +117,8 @@ synonym f+v df+v
 	    c1 i th dup v@' dup cell+ v@'  
 	    [undefined] use-vaxpy2 [if]
 		n2 0 ?do ( addr vc[i] vc[i+1] )
-		    vswap b1 i th v@ a j    n2 * i + dfloats + df@ f*+vvs
-		    vswap b1 i th v@ a j 1+ n2 * i + dfloats + df@ f*+vvs
+		    b1 i th v@ vrot vover a j n2 * i + dfloats + dup df@ f*+vvs
+		    v-rot n2 dfloats + df@ f*+vvs
 		loop
 	    [else]
 		n2 1 and if
