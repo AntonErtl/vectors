@@ -24,7 +24,7 @@ also c-lib
 
 : +=vect-data ( c-addr u )
     [:  ."   " 2dup type
-	."  = ((void *)" type ." ) + " 0 vect-data dec. ." ;" ;] >c ;
+	."  = *(void **)(((void *)" type ." ) + " 0 vect-datap dec. ." );" ;] >c ;
 
 : genv-binary-c ( "name" "type" "expression\n" -- )
     parse-name parse-name -1 parse {: d: n d: t d: x :}

@@ -141,17 +141,15 @@ simd-size unroll-factor * constant vector-granularity
     field: vect-refs \ reference count-1
 [then]
 field: vect-bytes
+field:  vect-datap
 [defined] use-chaining [if]
-    field:  vect-datap
     cfield: vect-traceentry
-    : vect-data vect-datap @ ;
     aligned
-[else]
-    simd-size naligned
-    0 +field vect-data
 [then]
 constant /vect
 synonym vect /vect
+
+: vect-data vect-datap @ ;
 
 \ type descriptors
 
@@ -221,25 +219,42 @@ s" vector length mismatch" exception constant vectlen-ex
     vsp @ dup cell+ vsp ! @ ;
 
 [undefined] use-chaining [if]
-: vect-free ( vect -- )
-    [defined] use-refcount [if]
-	?dup-if
-	    dup vect-refs @ if
-		-1 swap vect-refs +!
-	    else
-		free throw then
-	then
-    [else]
-	free throw
-    [then] ;
+    variable svect-free-list 0 svect-free-list
 
-: vect-alloc ( u -- vect )
-    vector-granularity 2dup naligned vect-data aligned_alloc dup 0= -59 and throw >r
-    [defined] use-refcount [if]
-	0 r@ vect-refs !
-    [then]
-    r@ vect-bytes !
-    r> ;
+    : svect-data-alloc ( u addr -- addr )
+	2dup vect-bytes !
+	vector-granularity rot over naligned aligned_alloc over vect-datap ! ;
+    
+    : svect-alloc ( u -- vect )
+	svect-free-list @ dup if ( u vect )
+	    dup @ svect-free-list ! assert( dup vect-data 0<> )
+	    2dup vect-bytes @ <> if
+		dup vect-data free throw
+		svect-data-alloc exit then
+	    nip exit then
+	drop /vect allocate throw svect-data-alloc ;
+
+    : svect-free ( vect -- )
+	svect-free-list @ over ! svect-free-list ! ;
+
+    : vect-free ( vect -- )
+	[defined] use-refcount [if]
+	    ?dup-if
+		dup vect-refs @ if
+		    -1 swap vect-refs +!
+		else
+		    svect-free then
+	    then
+	[else]
+	    svect-free
+	[then] ;
+
+    : vect-alloc ( u -- vect )
+	svect-alloc >r
+	[defined] use-refcount [if]
+	    0 r@ vect-refs !
+	[then]
+	r> ;
 
 : finish-trace ; immediate \ a noop when not chaining
 : print-trace ; immediate
@@ -291,8 +306,9 @@ s" vector length mismatch" exception constant vectlen-ex
 	>in ! parse-name evaluate parse-name 2drop parse-name 2drop
     else
 	drop ' execute >r
+	]] >r vect-data rot vect-data rot vect-data rot r> [[
 	s" {: addr1 addr2 addr u :} u" evaluate
-	]] vect-data [[ 0 vect-data ]] literal ?do
+	0 ]] literal ?do
 	    [[ s" addr1" evaluate ]] i + [[ r@ type-@ @ compile, ]]
 	    [[ s" addr2" evaluate ]] i + [[ r@ type-@ @ compile,
 	    parse-name evaluate 
@@ -335,8 +351,9 @@ s" vector length mismatch" exception constant vectlen-ex
 	>in ! parse-name evaluate parse-name 2drop parse-name 2drop
     else
 	drop ' execute >r
+	]] >r vect-data swap vect-data swap r> [[
 	s" {: addr1 addr u :} u" evaluate
-	]] vect-data [[ 0 vect-data ]] literal ?do
+	0 ]] literal ?do
 	    [[ s" addr1" evaluate ]] i + [[ r@ type-@ @ compile,
 	    parse-name evaluate
 	    s" addr" evaluate ]] i + [[ r@ type-! @ compile,
@@ -367,8 +384,9 @@ s" vector length mismatch" exception constant vectlen-ex
 	>in ! parse-name evaluate parse-name 2drop parse-name 2drop
     else
 	drop ' execute >r
+	]] >r vect-data swap vect-data swap r> [[
 	s" {: addr1 addr u :} u" evaluate
-	]] vect-data [[ 0 vect-data ]] literal ?do
+	0 ]] literal ?do
 	    [[ s" addr1" evaluate ]] i + [[ r@ type-@ @ compile,
 	    r@ type-over @ compile,
 	    parse-name evaluate
@@ -388,8 +406,9 @@ s" vector length mismatch" exception constant vectlen-ex
 	>in ! parse-name evaluate parse-name 2drop parse-name 2drop
     else
 	drop ' execute >r
+	]] >r vect-data swap vect-data swap r> [[
 	s" {: addr2 addr u :} u" evaluate
-	]] vect-data [[ 0 vect-data ]] literal ?do
+	0 ]] literal ?do
 	    [[ r@ type-dup @ compile,
 	    s" addr2" evaluate ]] i + [[ r@ type-@ @ compile,
 	    parse-name evaluate
@@ -409,8 +428,9 @@ s" vector length mismatch" exception constant vectlen-ex
 	>in ! parse-name evaluate parse-name 2drop parse-name 2drop
     else
 	drop ' execute >r
+	]] >r vect-data >r vect-data >r vect-data >r vect-data r> r> r> r> [[
 	s" {: addr1 addr2 addr3 addr u :} u" evaluate
-	]] vect-data [[ 0 vect-data ]] literal ?do
+	0 ]] literal ?do
 	    [[ s" addr1" evaluate ]] i + [[ r@ type-@ @ compile, ]]
 	    [[ s" addr2" evaluate ]] i + [[ r@ type-@ @ compile, ]]
 	    [[ s" addr3" evaluate ]] i + [[ r@ type-@ @ compile, ]]
