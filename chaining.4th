@@ -119,9 +119,7 @@ variable vect-free-list 0 vect-free-list
 : vect-alloc ( u -- vect )
     /vect-alloc >r
     dup vect-data-alloc r@ vect-datap !
-    [defined] use-refcount [if]
-	0 r@ vect-refs !
-    [then]
+    0 r@ vect-refs !
     r@ vect-bytes !
     r> ;
 

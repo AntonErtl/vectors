@@ -48,50 +48,38 @@ end-c-library
 
 : f*+vvs ( v1 v2 r -- v )
     vsp @ dup @ swap cell+ @
-    [defined] use-refcount [if]
-	{ vect1 vect2 | vect }
-	vect1 vect-bytes @ vect2 vect-bytes @ <> vectlen-ex and throw
-	vect1 vect-refs @ if
-	    -1 vect1 vect-refs +!
-	    vect2 vect-refs @ if
-		-1 vect2 vect-refs +!
-		vect1 vect-bytes @ vect-alloc
-	    else
-		vect2 then
+    { vect1 vect2 | vect }
+    vect1 vect-bytes @ vect2 vect-bytes @ <> vectlen-ex and throw
+    vect1 vect-refs @ if
+	-1 vect1 vect-refs +!
+	vect2 vect-refs @ if
+	    -1 vect2 vect-refs +!
+	    vect1 vect-bytes @ vect-alloc
 	else
-	    vect1 then
-	to vect
-    [else]
-	over { vect1 vect2 vect }
-    [then]
+	    vect2 then
+    else
+	vect1 then
+    to vect
     [defined] use-vaxpy [if]
 	vect1 vect2 vect vect vect-bytes @ vaxpy
     [else]
 	abort
     [then]
-    [defined] use-refcount [if]
-	vect vect1 = if
-	    vect2 vect-free then
-    [else]
-	vect2 vect-free
-    [then]
+    vect vect1 = if
+	vect2 vect-free then
     vect vsp @ cell+ dup vsp ! ! ;
 
 : f*+*+vvvss ( v1 v2 v3 r2 r3 -- v )
     \ v=v1+v2*r2+v3*r3
     vsp @ dup @ dup vect-bytes @ { vect3 u }
     cell+ dup @ u ?vectlen swap cell+ @ u ?vectlen { vect2 vect1 }
-    [defined] use-refcount [if]
-	vect1 vect-refs @ if
-	    -1 vect1 vect-refs +!
-	    vect1 vect2 vect3 u vect-alloc dup >r u vaxpy2
-	    r> vsp @ [ 2 cells ] literal + !
-	else
-	    vect1 vect2 vect3 vect1 u vaxpy2
-	then
-    [else]
+    vect1 vect-refs @ if
+	-1 vect1 vect-refs +!
+	vect1 vect2 vect3 u vect-alloc dup >r u vaxpy2
+	r> vsp @ [ 2 cells ] literal + !
+    else
 	vect1 vect2 vect3 vect1 u vaxpy2
-    [then]
+    then
     vect2 vect-free
     vect3 vect-free
     [ 2 cells ] literal vsp +! ;

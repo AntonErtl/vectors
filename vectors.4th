@@ -27,10 +27,6 @@
     1 constant unroll-factor
 [then]
 
-[defined] use-chaining [if]
-    1 constant use-refcount
-[then]
-
 \ missing features on some Forth systems
 
 [undefined] parse-name [if]
@@ -137,9 +133,7 @@
 simd-size unroll-factor * constant vector-granularity
 
 0
-[defined] use-refcount [if]
-    field: vect-refs \ reference count-1
-[then]
+field: vect-refs \ reference count-1
 field: vect-bytes
 field:  vect-datap
 [defined] use-chaining [if]
@@ -238,22 +232,16 @@ s" vector length mismatch" exception constant vectlen-ex
 	svect-free-list @ over ! svect-free-list ! ;
 
     : vect-free ( vect -- )
-	[defined] use-refcount [if]
-	    ?dup-if
-		dup vect-refs @ if
-		    -1 swap vect-refs +!
-		else
-		    svect-free then
-	    then
-	[else]
-	    svect-free
-	[then] ;
+	?dup-if
+	    dup vect-refs @ if
+		-1 swap vect-refs +!
+	    else
+		svect-free then
+	then ;
 
     : vect-alloc ( u -- vect )
 	svect-alloc >r
-	[defined] use-refcount [if]
-	    0 r@ vect-refs !
-	[then]
+	0 r@ vect-refs !
 	r> ;
 
 : finish-trace ; immediate \ a noop when not chaining
@@ -262,7 +250,7 @@ s" vector length mismatch" exception constant vectlen-ex
 
 : vect.short ( vect -- )
     dup hex. \ 16 ['] u. 16 base-execute
-    [defined] use-refcount [if] ." refs=" dup vect-refs @ 2 .r [then]
+    ." refs=" dup vect-refs @ 2 .r
     ."  bytes=" dup vect-bytes @ 2 .r
     space \ '=' '0' rot vect-data select emit ;
     vect-data hex. ;
@@ -320,29 +308,21 @@ s" vector length mismatch" exception constant vectlen-ex
 : genv-binary ( xt "name" "replacement" "type" "word" -- )
     type?exit : ]] vsp @ dup @ >r cell+ @ [[ ( r:vect1 vect2 ) ]]
     r@ vect-bytes @ over vect-bytes @ <> vectlen-ex and throw
-    [[ [defined] use-refcount [if] ]]
-	r@ vect-refs @ if
-	    [[ -1 ]] literal r@ vect-refs +!
-	    dup vect-refs @ if
-		[[ -1 ]] literal over vect-refs +!
-		r@ vect-bytes @ vect-alloc [[ ( r:vect1 vect2 vect ) ]]
-	    else
-		dup then
+    r@ vect-refs @ if
+	[[ -1 ]] literal r@ vect-refs +!
+	dup vect-refs @ if
+	    [[ -1 ]] literal over vect-refs +!
+	    r@ vect-bytes @ vect-alloc [[ ( r:vect1 vect2 vect ) ]]
 	else
-	    r@ then [[
-    [else]
-	]] r@ [[
-    [then] ]]
+	    dup then
+    else
+	r@ then
     [[ ( r:vect1 vect2 vect ) ]]
     r@ dup 2over r> vect-bytes @ [[ genv-binary-inner ]]
     [[ ( vect2 vect vect1 ) ]]
-    [[ [defined] use-refcount [if] ]]
-	over = if
-	    over vect-free then
-	nip
-    [[ [else] ]]
-	drop swap vect-free
-    [[ [then] ]]
+    over = if
+	over vect-free then
+    nip
     vsp @ cell+ dup vsp ! ! ; [[ ;
 
 : genv-unary-inner ( "replacement" "type" "word" -- )
@@ -362,16 +342,12 @@ s" vector length mismatch" exception constant vectlen-ex
     then ;
 
 : genv-unary-result ( -- ) ( run-time: r:vect1 -- r:vect1 vect )
-    [defined] use-refcount [if]
-	]] r@ vect-refs @ if
-	    [[ -1 ]]L r@ vect-refs +!
-	    r@ vect-bytes @ vect-alloc dup vsp @ !
-	else
-	    r@
-	then [[
-    [else]
-	]] r@ [[
-    [then] ;
+    ]] r@ vect-refs @ if
+	[[ -1 ]]L r@ vect-refs +!
+	r@ vect-bytes @ vect-alloc dup vsp @ !
+    else
+	r@
+    then [[ ;
 
 : genv-unary ( xt "name" "replacement" "type" "word" -- )
     type?exit : ]] vsp @ @ >r [[ genv-unary-result ]]
@@ -810,13 +786,8 @@ s" vector length mismatch" exception constant vectlen-ex
     r> vect-free ;
 
 : v@ ( v-addr -- v )
-    [defined] use-refcount [if]
 	@ dup >v
-	1 swap vect-refs +!
-    [else]
-	@ dup vect-bytes @ dup >r vect-alloc ( v1 v R:u )
-	tuck vect-data swap vect-data swap r> vector-granularity naligned move >v
-    [then] ;
+	1 swap vect-refs +! ;
 
 : v@' ( v-addr -- v )
     dup @ >v
