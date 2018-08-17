@@ -1,4 +1,8 @@
 #: "${SIMD_SIZE:=32}"
+if test -z "$GFORTH"; then
+  >&2 echo error: GFORTH is not set
+  exit 1
+fi
 TIMER="perf stat -x' ' -e cycles:u"
 #TIMER="perf stat -x' ' -e cycles:u -e instructions:u"
 #BLOCKING=
@@ -8,14 +12,14 @@ for SIMD_SIZE in 32; do
 #for SIMD_SIZE in 32 16; do
   for USE in simple vaxpy vaxpy2 chaining; do
   #for USE in simple vaxpy chaining; do
-    ~/gforth/gforth-fast -e "0 assert-level ! warnings off $SIMD_SIZE constant simd-size 1 constant vectlen 1 constant use-$USE 1 constant use-refcount $BLOCKING" vmatmul.4th benchn.4th -e bye
+    $GFORTH -e "0 assert-level ! warnings off $SIMD_SIZE constant simd-size 1 constant vectlen 1 constant use-$USE 1 constant use-refcount $BLOCKING" vmatmul.4th benchn.4th -e bye
     echo '%' $USE $SIMD_SIZE
     echo startline
     #for i in 00001 00100 00200 00300 00400 00500 0600 0700 0800 0900 01000 01500 02000 02500 03000; do
     for i in 00001 00100 00200 00300 00400 00500 01000 01500 02000 03000 04000 05000 06000 07000 08000 09000 10000 11000 12000; do
     #for i in 00001 00100; do # 00200 00300 00400 00500 00600 00700 00800 00900 01000 01100 01200 01300 01400 01500 01600 01700 01800 01900 02000; do
       echo -n "$i "
-      perf stat -x' ' -e cycles:u -e instructions:u -e LLC-loads:u -e LLC-stores:u  ~/gforth/gforth-fast -e "0 assert-level ! warnings off $SIMD_SIZE constant simd-size $i constant vectlen 1 constant use-$USE 1 constant use-refcount $BLOCKING" vmatmul.4th benchn.4th -e bye 2>&1|awk '{printf("%s %s ",$1,$2);}'
+      perf stat -x' ' -e cycles:u -e instructions:u -e LLC-loads:u -e LLC-stores:u $GFORTH -e "0 assert-level ! warnings off $SIMD_SIZE constant simd-size $i constant vectlen 1 constant use-$USE 1 constant use-refcount $BLOCKING" vmatmul.4th benchn.4th -e bye 2>&1|awk '{printf("%s %s ",$1,$2);}'
       echo
     done
     echo "($USE) label"
