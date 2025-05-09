@@ -3,6 +3,46 @@
 This package implements a wordset for vector processing, ideally
 implemented using SIMD instructions.
 
+## Status
+
+The documented words exist and have seen little testing, not sure how
+far the chaining stuff works.
+
+Reduction of a vectors to a scalar (e.g., the sum of the vector),
+generation of a vector (e.g., all elements with the same value), and
+vector shuffling or other reorderings are not yet even designed.
+
+There are currently several projects more urgent on my ToDo list, so
+don't expect any progress on this project soon.
+
+## Running
+
+Gforth 1.0 (when that exists) or, until then a not-too-old [Gforth
+snapshot](https://gforth.org/) is needed for running this code, as
+well as an installed gcc.  You can start up Gforth with this library
+loaded with
+
+```
+gforth compat/macros.4th vectors.4th
+```
+
+You can test some basic functionality with
+
+```
+gforth compat/macros.fs vtest.4th
+```
+
+You can define configuration parameters:
+
+```
+gforth -e '#32 constant simd-size 2 constant unroll-factor' compat/macros.4th vectors.4th
+```
+
+which are designed to influence performance.  Unfortunately the
+SIMD-SIZE parameter does not tell gcc which instruction-set extension
+(e.g., a SIMD-SIZE of 32 makes sense for AVX) it should use for
+compiling, so this does not work as well as one might expect.
+
 ## Concepts
 
 Vectors contain an array of integers or FP items.  All items in a
@@ -93,7 +133,7 @@ Fetch the vector token `v` from `v-addr`.
 Fetch the vector token `v` from `v-addr`, and store 0 at v-addr.  This
 word is more efficient than `v@`.
 
-###vector parallel
+### Vector parallel
 
 These words take one, two, or three vectors of the same length, and
 apply the operation elementwise, producing a vector of the same
