@@ -8,40 +8,40 @@ implemented using SIMD instructions.
 The documented words exist and have seen little testing, not sure how
 far the chaining stuff works.
 
-Reduction of a vectors to a scalar (e.g., the sum of the vector),
+Missing: Reduction of a vectors to a scalar (e.g., the sum of the vector),
 generation of a vector (e.g., all elements with the same value), and
-vector shuffling or other reorderings are not yet even designed.
+vector shuffling or other reorderings (not yet even designed).
 
 There are currently several projects more urgent on my ToDo list, so
 don't expect any progress on this project soon.
 
 ## Running
 
-Gforth 1.0 (when that exists) or, until then a not-too-old [Gforth
-snapshot](https://gforth.org/) is needed for running this code, as
-well as an installed gcc.  You can start up Gforth with this library
-loaded with
+For now this library only works on Gforth 1.0 (when that exists) or,
+until then a not-too-old [Gforth snapshot](https://gforth.org/) is
+needed for running this code, as well as an installed gcc.  You can
+start up Gforth with this library loaded with
 
 ```
-gforth compat/macros.4th vectors.4th
+gforth vectors.4th
 ```
 
 You can test some basic functionality with
 
 ```
-gforth compat/macros.fs vtest.4th
+gforth vtest.4th
 ```
 
 You can define configuration parameters:
 
 ```
-gforth -e '#32 constant simd-size 2 constant unroll-factor' compat/macros.4th vectors.4th
+gforth -e '#32 constant simd-size 2 constant unroll-factor' vectors.4th
 ```
 
-which are designed to influence performance.  Unfortunately the
-SIMD-SIZE parameter does not tell gcc which instruction-set extension
-(e.g., a SIMD-SIZE of 32 makes sense for AVX) it should use for
-compiling, so this does not work as well as one might expect.
+which are designed to influence performance.  On AMD64 a SIMD-size of
+32 turns on the use of AVX2 (and the result will only work on CPUs
+with AVX2 support), and a SIMD-size of 64 turn on the use of AVX-512
+(and the result will only work on CPUs with AVX-512 support).
 
 ## Concepts
 

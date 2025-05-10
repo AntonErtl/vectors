@@ -29,6 +29,10 @@
 
 \ missing features on some Forth systems
 
+[undefined] ]]L [if]
+    require compat/macros.fs
+[then]
+
 [undefined] parse-name [if]
     include extensions/parse-name.fs
 [then]

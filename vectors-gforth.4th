@@ -113,6 +113,12 @@ previous
 
 c-library vectors
     [: ." #define SIMD_SIZE " simd-size dec. ;] >c
+    \c #if defined(__x86_64__) && SIMD_SIZE == 32
+    \c #pragma GCC target "avx2"
+    \c #endif
+    \c #if defined(__x86_64__) && SIMD_SIZE == 64
+    \c #pragma GCC target "arch=x86-64-v4"
+    \c #endif
     \c #include <stddef.h>
     \c #include <stdlib.h>
     \c #include <stdint.h>
